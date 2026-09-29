@@ -54,7 +54,7 @@
       </div>
       <p class="msg err" id="email-err" hidden>Revisá que el email esté bien escrito.</p>
       <div class="tabs" role="tablist">
-        <button type="button" class="tab active" id="tab-mp" role="tab" onclick="cambiarTab('mp')">Tarjeta</button>
+        <button type="button" class="tab active" id="tab-mp" role="tab" onclick="cambiarTab('mp')">Pesos (ARS)</button>
         <button type="button" class="tab" id="tab-pp" role="tab" onclick="cambiarTab('pp')">PayPal (USD)</button>
       </div>
       <div id="mp-section">
@@ -128,11 +128,14 @@
       var mp = new MercadoPago(C.MP_PUBLIC_KEY, { locale: 'es-AR' });
       brick = await mp.bricks().create('payment', 'paymentBrick_container', {
         initialization: { amount: total(), preferenceId: j.preference_id, payer: { email: email() } },
-        customization: { visual: { hideFormTitle: true, style: { theme: 'default' } }, paymentMethods: { creditCard: 'all', debitCard: 'all' } },
+        customization: { visual: { hideFormTitle: true, style: { theme: 'default' } }, paymentMethods: { creditCard: 'all', debitCard: 'all', mercadoPago: 'all' } },
         callbacks: {
           onReady: function () { clearTimeout(timer); },
           onSubmit: function (p) {
             return new Promise(async function (resolve, reject) {
+              // "Dinero en cuenta" / Mercado Pago: el Brick lo resuelve solo con la preferencia
+              // (el pago llega por webhook); acá no se procesa nada.
+              if (p.selectedPaymentMethod === 'wallet_purchase' || p.selectedPaymentMethod === 'account_money') return resolve();
               try {
                 var pr = await fetch(C.MP_WORKER + '/pay', {
                   method: 'POST', headers: { 'Content-Type': 'application/json' },
