@@ -17,7 +17,7 @@ Frontend estático de `academy.vamatienda.com.ar` (GitHub Pages, `main`, raíz, 
 
 ## Pendientes / decisiones
 - `PIXEL_ID` vacío en `assets/vama.js`: falta el ID del Pixel de Meta (sin él no se carga el pixel; PageView/Lead/InitiateCheckout ya están cableados). Purchase sale por CAPI desde el webhook de MP.
-- Los archivos pagos (kit v2) se suben desde el panel admin de training a `academy-plata-en-orden` (`Plata-en-Orden-con-ejemplos.xlsx`, `Plata-en-Orden-en-blanco.xlsx`, `Ordena-tu-plata-en-7-dias.pdf`, `Tutorial-Plata-en-Orden.mp4`) y a `academy-plata-en-orden-fondo90` (`Fondo-de-emergencia-en-90-dias.pdf`), con NOMBRES EXACTOS.
-- `/cursos/` hoy es un área por módulos con recursos descargables. El kit pide "estilo curso" con la guía de 7 días como lecciones: falta pasar el texto de la guía al Worker (no puede ir al repo público).
+- Los archivos pagos (kit v2) YA ESTÁN subidos a R2 (29/09). Para reemplazarlos, subir desde el panel admin de training a `academy-plata-en-orden` (`Plata-en-Orden-con-ejemplos.xlsx`, `Plata-en-Orden-en-blanco.xlsx`, `Ordena-tu-plata-en-7-dias.pdf`, `Tutorial-Plata-en-Orden.mp4`) y a `academy-plata-en-orden-fondo90` (`Fondo-de-emergencia-en-90-dias.pdf`), con NOMBRES EXACTOS.
+- `/cursos/` es un área estilo curso: módulos con recursos descargables y la guía de 7 días como LECCIONES (texto servido por el Worker con sesión, progreso por cuenta; el PDF sigue como descarga).
 - Instrucción de la planilla en Sheets: como solo hay xlsx, el acceso explica "subir a Drive y guardar como Hojas de cálculo de Google". Si se publica un Google Sheet maestro, cambiarla por "Archivo › Hacer una copia".
 - DNS (Vaneh): zona `vamatienda.com.ar` en Cloudflare, CNAME `academy` → `aquivane.github.io` (proxy gris), SPF/DKIM de Brevo para `hola@vamatienda.com.ar`.

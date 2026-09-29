@@ -7,6 +7,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&display=swap">
 <link rel="stylesheet" href="/assets/vama.css">
+<style>
+.prog{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:6px 0 16px}.prog i{display:block;height:100%;background:var(--acc);border-radius:99px;transition:width .3s}
+details.les{background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:10px}
+details.les summary{cursor:pointer;list-style:none;padding:16px 18px;display:flex;gap:12px;align-items:center;font-weight:700;color:var(--dark)}
+details.les summary::-webkit-details-marker{display:none}
+details.les .et{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--acc);white-space:nowrap}
+details.les .ck{margin-left:auto;font-size:18px}
+details.les .lb{padding:0 18px 18px}
+.tarea{background:var(--light);border-radius:12px;padding:12px 14px;margin:0 0 14px;color:var(--dark)}
+@media (max-width:600px){details.les summary{flex-wrap:wrap}}
+</style>
 </head><body>
 <header class="top"><div class="wrap"><a class="brand" href="/">VAMA ACADEMY</a><button class="link" id="salir" type="button" hidden style="background:none;cursor:pointer;font-family:inherit">Salir</button></div></header>
 <main class="wrap"><div id="login" class="card narrow" hidden>
@@ -43,7 +54,7 @@ var INFO = {
 var MODULOS = [
   { t: 'Módulo 1 · Empezá acá', ids: ['tutorial'] },
   { t: 'Módulo 2 · Tu planilla', ids: ['planilla-ejemplos', 'planilla-blanco'] },
-  { t: 'Módulo 3 · Guía: Ordená tu plata en 7 días', ids: ['guia'] },
+  { t: 'Módulo 3 · Guía: Ordená tu plata en 7 días (lecciones)', ids: ['guia'] },
   { t: 'Bonus · Plan de 90 días para tu fondo de emergencia', ids: ['fondo'] }
 ];
 function vista(logueado) { $('login').hidden = logueado; $('area').hidden = !logueado; $('salir').hidden = !logueado; }
@@ -80,7 +91,39 @@ function tarjeta(it) {
   return d;
 }
 
-function pintar(data) {
+function esc(t) { return String(t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function rich(t) { return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }
+
+// Lecciones de la guía (texto pago: viene del Worker, con sesión).
+function pintarLecciones(cont, lec, guia) {
+  var hechas = lec.hechas.slice();
+  var wrap = document.createElement('div');
+  var total = lec.lecciones.length;
+  var barra = document.createElement('div'); barra.innerHTML = '<p class="muted" style="margin:0" id="prog-t"></p><div class="prog"><i id="prog-b"></i></div>';
+  wrap.appendChild(barra);
+  function progreso() { $('prog-t').textContent = hechas.length + ' de ' + total + ' lecciones completadas'; $('prog-b').style.width = Math.round(hechas.length * 100 / total) + '%'; }
+  lec.lecciones.forEach(function (l) {
+    var d = document.createElement('details'); d.className = 'les';
+    var sm = document.createElement('summary');
+    sm.innerHTML = '<span class="et"></span><span class="tt"></span><span class="ck" aria-hidden="true"></span>';
+    sm.querySelector('.et').textContent = l.etiqueta; sm.querySelector('.tt').textContent = l.titulo;
+    var body = document.createElement('div'); body.className = 'lb';
+    body.innerHTML = l.cuerpo.map(function (p) { return '<p>' + rich(p) + '</p>'; }).join('') + (l.tarea ? '<p class="tarea"><b>Tarea:</b> ' + esc(l.tarea) + '</p>' : '');
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'cta';
+    function marca() { var h = hechas.indexOf(l.id) >= 0; sm.querySelector('.ck').textContent = h ? '✅' : ''; b.textContent = h ? 'Marcar como pendiente' : 'Marcar como hecha'; b.className = h ? 'cta ghost' : 'cta'; }
+    b.onclick = function () {
+      var hecha = hechas.indexOf(l.id) < 0; b.disabled = true;
+      VAMA.api('/academy/leccion', { method: 'POST', auth: true, body: { id: l.id, hecha: hecha } }).then(function (r) {
+        if (r.ok) hechas = r.data.hechas; marca(); progreso();
+      }).catch(function () {}).then(function () { b.disabled = false; });
+    };
+    body.appendChild(b); d.appendChild(sm); d.appendChild(body); wrap.appendChild(d); marca();
+  });
+  cont.appendChild(wrap); progreso();
+  if (guia) cont.appendChild(tarjeta(guia));
+}
+
+function pintar(data, lec) {
   vista(true);
   $('hola').textContent = data.nombre ? 'Hola, ' + data.nombre : 'Mis cursos';
   var cont = $('items'); cont.innerHTML = '';
@@ -89,7 +132,7 @@ function pintar(data) {
     var its = m.ids.map(function (i) { return porId[i]; }).filter(Boolean);
     if (!its.length) return;
     var h = document.createElement('p'); h.className = 'eyebrow'; h.style.margin = '28px 0 12px'; h.textContent = m.t; cont.appendChild(h);
-    its.forEach(function (it) { cont.appendChild(tarjeta(it)); });
+    if (m.ids[0] === 'guia' && lec) pintarLecciones(cont, lec, porId.guia); else its.forEach(function (it) { cont.appendChild(tarjeta(it)); });
   });
 }
 
@@ -97,7 +140,9 @@ function cargar() {
   VAMA.api('/academy/archivos', { auth: true }).then(function (r) {
     if (r.status === 401) { salir(); return; }
     if (!r.ok) { vista(true); msg('aerr', 'No pudimos cargar tus archivos. Recargá la página.'); return; }
-    pintar(r.data);
+    // Lecciones: si fallan, queda la guía en PDF como recurso descargable.
+    VAMA.api('/academy/lecciones', { auth: true }).then(function (l) { pintar(r.data, l.ok && l.data.lecciones ? l.data : null); })
+      .catch(function () { pintar(r.data, null); });
   }).catch(function () { vista(true); msg('aerr', 'Error de conexión. Recargá la página.'); });
 }
 function salir() {
