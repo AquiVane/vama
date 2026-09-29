@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Mis cursos — VAMA Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&display=swap">
+<link rel="stylesheet" href="/assets/vama.css">
+</head><body>
+<header class="top"><div class="wrap"><a class="brand" href="/">VAMA ACADEMY</a><button class="link" id="salir" type="button" hidden style="background:none;cursor:pointer;font-family:inherit">Salir</button></div></header>
+<main class="wrap"><div id="login" class="card narrow" hidden>
+  <p class="eyebrow">Mis cursos</p>
+  <h1 class="serif">Ingresá</h1>
+  <p class="msg err" id="lerr" hidden></p>
+  <form id="lf" novalidate>
+    <div class="field"><label for="lemail">Email</label><input id="lemail" type="email" autocomplete="email" required></div>
+    <div class="field"><label for="lpass">Contraseña</label><input id="lpass" type="password" autocomplete="current-password" required></div>
+    <button class="cta block" type="submit" id="lbtn">Entrar</button>
+  </form>
+  <p style="margin:16px 0 0;text-align:center"><a href="#" id="olvide">Olvidé mi contraseña</a></p>
+  <p class="msg okk" id="fmsg" hidden style="margin-top:16px"></p>
+</div>
+<div id="area" hidden>
+  <p class="eyebrow">Mi acceso</p>
+  <h1 class="serif" id="hola">Mis cursos</h1>
+  <p class="muted">Acá tenés todo lo que compraste, ordenado por módulos. Los archivos se descargan solo con tu usuario.</p>
+  <p class="msg err" id="aerr" hidden></p>
+  <div id="items"></div>
+</div></main>
+<footer class="foot">Contenido educativo. No constituye asesoramiento financiero.<br>¿Necesitás ayuda? <a href="mailto:hola@vamatienda.com.ar">hola@vamatienda.com.ar</a></footer>
+<script src="/assets/vama.js"></script>
+<script>
+var $ = function (i) { return document.getElementById(i); };
+var ICON = { xlsx: '📊', pdf: '📘', mp4: '🎬' };
+var INFO = {
+  'planilla-ejemplos': 'La planilla con datos de ejemplo cargados, para ver cómo funciona todo. Para usarla en Google Sheets: descargala, subila a tu Google Drive, abrila con Hojas de cálculo de Google y elegí Archivo › Guardar como Hojas de cálculo de Google. También funciona directo en Excel.',
+  'planilla-blanco': 'La misma planilla sin datos, lista para cargar la tuya. Se usa igual en Google Sheets (subila a Drive) o en Excel.',
+  guia: 'Tu plan día por día para ordenar tu plata en una semana.',
+  tutorial: 'Un recorrido de 2 minutos por la planilla.',
+  fondo: 'Tu bonus: 12 semanas, una acción por semana, para armar tu fondo de emergencia.'
+};
+var MODULOS = [
+  { t: 'Módulo 1 · Empezá acá', ids: ['tutorial'] },
+  { t: 'Módulo 2 · Tu planilla', ids: ['planilla-ejemplos', 'planilla-blanco'] },
+  { t: 'Módulo 3 · Guía: Ordená tu plata en 7 días', ids: ['guia'] },
+  { t: 'Bonus · Plan de 90 días para tu fondo de emergencia', ids: ['fondo'] }
+];
+function vista(logueado) { $('login').hidden = logueado; $('area').hidden = !logueado; $('salir').hidden = !logueado; }
+function msg(id, t) { $(id).textContent = t; $(id).hidden = false; }
+
+// Descarga con la sesión: el archivo pago nunca tiene un link público.
+function bajar(it, btn, modo) {
+  var t = VAMA.store('vama_token'), orig = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Preparando…'; $('aerr').hidden = true;
+  return fetch(VAMA.cfg.CORE + '/academy/archivo/' + it.curso + '/' + it.id, { headers: { Authorization: 'Bearer ' + t } }).then(function (r) {
+    if (r.status === 401) { salir(); throw new Error('sesion'); }
+    if (!r.ok) throw new Error('No pudimos descargar el archivo. Intentá de nuevo.');
+    return r.blob();
+  }).then(function (b) {
+    var url = URL.createObjectURL(b);
+    if (modo === 'ver') { var v = document.getElementById('v-' + it.id); v.src = url; v.hidden = false; v.play(); }
+    else { var a = document.createElement('a'); a.href = url; a.download = it.nombre.replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-') + '.' + it.tipo; document.body.appendChild(a); a.click(); a.remove(); }
+  }).catch(function (e) { if (e.message !== 'sesion') msg('aerr', e.message); })
+    .then(function () { btn.disabled = false; btn.textContent = orig; });
+}
+
+function tarjeta(it) {
+  var d = document.createElement('div'); d.className = 'card'; d.style.marginBottom = '12px';
+  d.innerHTML = '<h2>' + (ICON[it.tipo] || '📄') + ' <span class="t"></span></h2><p class="muted i"></p><div class="acc"></div>';
+  d.querySelector('.t').textContent = it.nombre;
+  d.querySelector('.i').textContent = INFO[it.id] || '';
+  var acc = d.querySelector('.acc');
+  if (!it.disponible) { acc.innerHTML = '<p class="msg warn" style="margin:0">Este archivo se está preparando. Escribinos a hola@vamatienda.com.ar si en unas horas todavía no está.</p>'; return d; }
+  var b = document.createElement('button'); b.type = 'button'; b.className = 'cta'; b.textContent = 'Descargar'; b.onclick = function () { bajar(it, b, 'bajar'); }; acc.appendChild(b);
+  if (it.tipo === 'mp4') {
+    var w = document.createElement('button'); w.type = 'button'; w.className = 'cta ghost'; w.style.marginLeft = '10px'; w.textContent = 'Ver ahora'; w.onclick = function () { bajar(it, w, 'ver'); }; acc.appendChild(w);
+    var v = document.createElement('video'); v.id = 'v-' + it.id; v.controls = true; v.hidden = true; v.playsInline = true; v.style.cssText = 'width:100%;max-width:720px;margin-top:16px;border-radius:12px;display:block'; acc.appendChild(v);
+  }
+  return d;
+}
+
+function pintar(data) {
+  vista(true);
+  $('hola').textContent = data.nombre ? 'Hola, ' + data.nombre : 'Mis cursos';
+  var cont = $('items'); cont.innerHTML = '';
+  var porId = {}; data.items.forEach(function (it) { porId[it.id] = it; });
+  MODULOS.forEach(function (m) {
+    var its = m.ids.map(function (i) { return porId[i]; }).filter(Boolean);
+    if (!its.length) return;
+    var h = document.createElement('p'); h.className = 'eyebrow'; h.style.margin = '28px 0 12px'; h.textContent = m.t; cont.appendChild(h);
+    its.forEach(function (it) { cont.appendChild(tarjeta(it)); });
+  });
+}
+
+function cargar() {
+  VAMA.api('/academy/archivos', { auth: true }).then(function (r) {
+    if (r.status === 401) { salir(); return; }
+    if (!r.ok) { vista(true); msg('aerr', 'No pudimos cargar tus archivos. Recargá la página.'); return; }
+    pintar(r.data);
+  }).catch(function () { vista(true); msg('aerr', 'Error de conexión. Recargá la página.'); });
+}
+function salir() {
+  if (VAMA.store('vama_token')) VAMA.api('/auth/logout', { method: 'POST', auth: true }).catch(function () {});
+  VAMA.store('vama_token', null); vista(false);
+}
+$('salir').addEventListener('click', salir);
+
+$('lf').addEventListener('submit', function (e) {
+  e.preventDefault(); $('lerr').hidden = true;
+  var mail = $('lemail').value.trim().toLowerCase(), p = $('lpass').value;
+  if (!VAMA.emailOk(mail) || !p) return msg('lerr', 'Completá tu email y tu contraseña.');
+  $('lbtn').disabled = true; $('lbtn').textContent = 'Entrando…';
+  VAMA.api('/auth/login', { method: 'POST', body: { email: mail, password: p } }).then(function (r) {
+    if (r.ok && r.data.token) { VAMA.store('vama_token', r.data.token); $('lpass').value = ''; cargar(); }
+    else msg('lerr', r.data.error || 'Email o contraseña incorrectos.');
+  }).catch(function () { msg('lerr', 'Error de conexión. Intentá de nuevo.'); })
+    .then(function () { $('lbtn').disabled = false; $('lbtn').textContent = 'Entrar'; });
+});
+$('olvide').addEventListener('click', function (e) {
+  e.preventDefault(); $('lerr').hidden = true;
+  var mail = $('lemail').value.trim().toLowerCase();
+  if (!VAMA.emailOk(mail)) return msg('lerr', 'Escribí tu email arriba y volvé a tocar "Olvidé mi contraseña".');
+  VAMA.api('/auth/forgot', { method: 'POST', body: { email: mail } }).then(function () {
+    msg('fmsg', 'Si el email tiene cuenta, te llega un link para crear una contraseña nueva en unos minutos.');
+  }).catch(function () { msg('lerr', 'Error de conexión. Intentá de nuevo.'); });
+});
+
+if (VAMA.store('vama_token')) cargar(); else vista(false);
+</script>
+</body></html>

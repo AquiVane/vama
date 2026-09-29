@@ -10,7 +10,6 @@ window.VAMA = (function () {
     PAYPAL_CLIENT_ID: 'AYuQX3JJShvSkgNn0C195h3GEHGiKNtx44X3wd_5PEoBI1iinpysmDzNRqdZ7blNuZvFWIwcwhc9qiOP',
     // ID del Pixel de Meta (Events Manager). Vacío = el pixel no se carga.
     PIXEL_ID: '',
-    PRECIO: 14900, PRECIO_BUMP: 6900, USD: 10.90, USD_BUMP: 4.90,
   };
 
   function cookie(n) {
@@ -42,5 +41,59 @@ window.VAMA = (function () {
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, status: r.status, data: j }; }); });
   }
 
-  return { cfg: cfg, cookie: cookie, store: store, money: money, emailOk: emailOk, track: track, api: api };
+  // ── Visitante + oferta de lanzamiento ──
+  // El servidor guarda la fecha de primera visita (7 días de precio de
+  // lanzamiento) y es quien decide el precio que se cobra. Acá solo se muestra.
+  function vid() {
+    var v = store('vama_vid');
+    if (!v || !/^[a-zA-Z0-9-]{16,64}$/.test(v)) {
+      v = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
+      store('vama_vid', v);
+    }
+    try { document.cookie = 'vama_vid=' + v + ';max-age=31536000;path=/;SameSite=Lax'; } catch (e) {}
+    return v;
+  }
+  function leadGuardado() { try { return JSON.parse(store('vama_lead') || '{}'); } catch (e) { return {}; } }
+
+  var ofertaP = {};
+  function oferta(producto) {
+    if (!ofertaP[producto]) {
+      ofertaP[producto] = api('/api/oferta', { method: 'POST', body: { producto: producto, vid: vid(), email: leadGuardado().email || '' } })
+        .then(function (r) { return r.ok && r.data && r.data.ok ? r.data : null; })
+        .catch(function () { return null; });
+    }
+    return ofertaP[producto];
+  }
+
+  // Timer de la oferta: muestra la cuenta regresiva y, al vencer, pasa a precio de lista.
+  function ofertaInit(producto) {
+    var K = 'vama_oferta_' + producto, D = 7 * 864e5, off = 0, fin = 0, vencida = false;
+    var t0 = parseInt(store(K), 10);
+    fin = (t0 && t0 <= Date.now() ? t0 : Date.now()) + D;
+    function p(n) { return (n < 10 ? '0' : '') + n; }
+    function vencer() {
+      if (vencida) return; vencida = true;
+      document.documentElement.classList.add('oferta-vencida');
+      document.querySelectorAll('[data-lista]').forEach(function (e) { e.textContent = e.getAttribute('data-lista'); });
+    }
+    function tick() {
+      var r = fin - (Date.now() + off);
+      if (r <= 0) return vencer();
+      var d = Math.floor(r / 864e5), h = Math.floor(r % 864e5 / 36e5), m = Math.floor(r % 36e5 / 6e4), s = Math.floor(r % 6e4 / 1e3);
+      document.querySelectorAll('[data-timer]').forEach(function (e) { e.textContent = p(d) + 'd : ' + p(h) + 'h : ' + p(m) + 'm : ' + p(s) + 's'; });
+      document.querySelectorAll('[data-timer-corto]').forEach(function (e) { e.textContent = d + 'd ' + h + 'h ' + p(m) + 'm'; });
+      setTimeout(tick, 1000);
+    }
+    var estado = oferta(producto).then(function (o) {
+      if (!o) return null;
+      off = o.ahora - Date.now();          // corrige el reloj del dispositivo
+      fin = o.vence; store(K, String(o.inicio));
+      if (!o.activa) vencer();
+      return o;
+    });
+    tick();
+    return estado;
+  }
+
+  return { vid: vid, oferta: oferta, ofertaInit: ofertaInit, leadGuardado: leadGuardado, cfg: cfg, cookie: cookie, store: store, money: money, emailOk: emailOk, track: track, api: api };
 })();
