@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /registro/
+Disallow: /reset-password/
+Disallow: /plata-en-orden/checkout/
+Disallow: /plata-en-orden/gracias/
+Disallow: /plata-en-orden/acceso/

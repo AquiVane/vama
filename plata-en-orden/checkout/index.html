@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Checkout — Plata en Orden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&display=swap">
+<link rel="stylesheet" href="/assets/vama.css">
+<style>
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+.line{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line)}
+.line.total{border-bottom:0;font-weight:700;font-size:20px;padding-top:14px}
+.line small{display:block;color:var(--muted);font-weight:400;font-size:14px}
+.incl{list-style:none;padding:0;margin:14px 0 0;font-size:15px;color:var(--muted)}
+.incl li{margin-bottom:4px}
+.bump{display:flex;gap:12px;align-items:flex-start;background:var(--yel);border:2px dashed #E0B400;border-radius:14px;padding:14px 16px;margin-top:18px;cursor:pointer}
+.bump input{width:22px;height:22px;margin:3px 0 0;flex-shrink:0;accent-color:var(--acc)}
+.bump b{display:block;margin-bottom:4px}
+.bump span{font-size:15px}
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tab{flex:1 1 140px;min-height:48px;border:1.5px solid #C9D3CE;background:#fff;border-radius:12px;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}
+.tab.active{border-color:var(--acc);background:var(--light);color:var(--dark)}
+#paymentBrick_container{min-height:280px}
+.secure{font-size:13px;color:var(--muted);text-align:center;margin-top:14px}
+@media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><a class="brand" href="/">VAMA ACADEMY</a><a class="link" href="/plata-en-orden/">← Volver</a></div></header>
+<main class="wrap">
+  <p class="eyebrow">Checkout</p>
+  <h1 class="serif">Terminá tu compra</h1>
+  <div class="grid">
+    <section class="card" aria-label="Resumen del pedido">
+      <h2>Tu pedido</h2>
+      <div class="line"><span>Plata en Orden<small>Planilla + guía de 7 días + tutorial</small></span><b id="l-base"></b></div>
+      <div class="line" id="l-bump-row" hidden><span>Plan de 90 días para tu fondo de emergencia</span><b id="l-bump"></b></div>
+      <div class="line total"><span>Total</span><span id="total"></span></div>
+      <ul class="incl"><li>✓ Acceso inmediato en tu email</li><li>✓ Pago único, sin suscripción</li><li>✓ Actualizaciones incluidas</li></ul>
+      <label class="bump" for="bump">
+        <input type="checkbox" id="bump">
+        <span><b>Sí, sumo el Plan de 90 días para mi fondo de emergencia por $6.900.</b>
+        12 semanas, una acción por semana, para dejar de depender de la tarjeta cuando aparece un imprevisto.</span>
+      </label>
+    </section>
+
+    <section class="card" aria-label="Pago">
+      <h2>Pagá de forma segura</h2>
+      <div class="field">
+        <label for="email">Tu email (acá te enviamos el acceso)</label>
+        <input type="email" id="email" autocomplete="email" inputmode="email" required>
+      </div>
+      <p class="msg err" id="email-err" hidden>Revisá que el email esté bien escrito.</p>
+      <div class="tabs" role="tablist">
+        <button type="button" class="tab active" id="tab-mp" role="tab" onclick="cambiarTab('mp')">Tarjeta</button>
+        <button type="button" class="tab" id="tab-pp" role="tab" onclick="cambiarTab('pp')">PayPal (USD)</button>
+      </div>
+      <div id="mp-section">
+        <div id="paymentBrick_container"></div>
+        <div id="mpAlternativa"></div>
+        <p id="mpmsg" class="muted" style="margin-top:12px;font-weight:700"></p>
+      </div>
+      <div id="pp-section" hidden>
+        <p class="muted" id="pp-total" style="font-size:15px"></p>
+        <div id="paypal_container" style="min-height:150px"></div>
+        <p id="ppmsg" style="margin-top:12px;font-weight:700"></p>
+      </div>
+      <p class="secure">🔒 Pagos procesados por Mercado Pago y PayPal. No guardamos los datos de tu tarjeta.</p>
+    </section>
+  </div>
+</main>
+<footer class="foot">Contenido educativo. No constituye asesoramiento financiero.<br>¿Problemas con el pago? Escribinos a <a href="mailto:hola@vamatienda.com.ar">hola@vamatienda.com.ar</a></footer>
+
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AYuQX3JJShvSkgNn0C195h3GEHGiKNtx44X3wd_5PEoBI1iinpysmDzNRqdZ7blNuZvFWIwcwhc9qiOP&currency=USD&intent=capture"></script>
+<script src="/assets/vama.js"></script>
+<script>
+(function () {
+  var C = VAMA.cfg, PRODUCTO = 'plata-en-orden', BUMP = 'plata-en-orden-fondo90';
+  var $ = function (id) { return document.getElementById(id); };
+  var conBump = false, brick = null, brickBusy = false, rehacer = false, ppListo = false, tab = 'mp';
+
+  function total() { return C.PRECIO + (conBump ? C.PRECIO_BUMP : 0); }
+  function totalUsd() { return +(C.USD + (conBump ? C.USD_BUMP : 0)).toFixed(2); }
+  function items() {
+    var it = [{ producto: PRODUCTO, amount: C.PRECIO }];
+    if (conBump) it.push({ producto: BUMP, amount: C.PRECIO_BUMP });
+    return it;
+  }
+  function email() { return $('email').value.trim().toLowerCase(); }
+  function emailValido() { var ok = VAMA.emailOk(email()); $('email-err').hidden = ok || !$('email').value; return ok; }
+  function meta() {
+    return { fbp: VAMA.cookie('_fbp'), fbc: VAMA.cookie('_fbc'), client_user_agent: navigator.userAgent, event_source_url: location.href };
+  }
+
+  function pintar() {
+    $('l-base').textContent = VAMA.money(C.PRECIO);
+    $('l-bump-row').hidden = !conBump;
+    $('l-bump').textContent = VAMA.money(C.PRECIO_BUMP);
+    $('total').textContent = VAMA.money(total());
+    $('pp-total').textContent = 'Total a pagar con PayPal: USD ' + totalUsd().toFixed(2);
+  }
+
+  // ── Mercado Pago (Card Payment Brick embebido: nunca se sale de esta página) ──
+  function fallo() {
+    $('mpAlternativa').innerHTML = '<div class="msg warn">El formulario de pago está tardando en cargar. <button class="cta ghost" type="button" id="reintentar" style="min-height:44px;margin-top:10px">Reintentar</button><br><span style="font-size:13px">Si sigue sin cargar, escribinos a hola@vamatienda.com.ar y te ayudamos a completar la compra.</span></div>';
+    $('reintentar').onclick = function () { $('mpAlternativa').innerHTML = ''; montarBrick(); };
+  }
+  async function montarBrick() {
+    if (brickBusy) { rehacer = true; return; }  // cambió el total/email mientras cargaba: se rehace al terminar
+    if (!emailValido()) return;
+    brickBusy = true;
+    var msg = $('mpmsg'); msg.textContent = '';
+    var timer = setTimeout(fallo, 7000);
+    try {
+      if (brick) { try { await brick.unmount(); } catch (e) {} brick = null; }
+      $('paymentBrick_container').innerHTML = '';
+      var ctrl = new AbortController(), tmo = setTimeout(function () { ctrl.abort(); }, 8000);
+      var r = await fetch(C.MP_WORKER + '/preference', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctrl.signal,
+        body: JSON.stringify(Object.assign({ items: items() }, meta())),
+      });
+      clearTimeout(tmo);
+      var j = await r.json();
+      if (!j.preference_id) throw new Error('sin preference_id');
+      var mp = new MercadoPago(C.MP_PUBLIC_KEY, { locale: 'es-AR' });
+      brick = await mp.bricks().create('payment', 'paymentBrick_container', {
+        initialization: { amount: total(), preferenceId: j.preference_id, payer: { email: email() } },
+        customization: { visual: { hideFormTitle: true, style: { theme: 'default' } }, paymentMethods: { creditCard: 'all', debitCard: 'all' } },
+        callbacks: {
+          onReady: function () { clearTimeout(timer); },
+          onSubmit: function (p) {
+            return new Promise(async function (resolve, reject) {
+              try {
+                var pr = await fetch(C.MP_WORKER + '/pay', {
+                  method: 'POST', headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(Object.assign({}, p.formData, { items: items() }, meta())),
+                });
+                var d = await pr.json();
+                if (d.status === 'approved') {
+                  msg.style.color = '#16a34a'; msg.textContent = '✅ ¡Pago aprobado! Te llevamos a tu confirmación…';
+                  $('paymentBrick_container').style.display = 'none';
+                  setTimeout(function () { location.href = '/plata-en-orden/gracias/'; }, 1500);
+                } else if (d.status === 'in_process' || d.status === 'pending') {
+                  location.href = '/plata-en-orden/gracias/?estado=pendiente';
+                } else {
+                  msg.style.color = '#B91C1C'; msg.textContent = '⚠️ No se pudo procesar el pago. Revisá los datos e intentá de nuevo.';
+                }
+                resolve();
+              } catch (e) { msg.style.color = '#B91C1C'; msg.textContent = 'Error de conexión. Intentá de nuevo.'; reject(); }
+            });
+          },
+          onError: function (e) { console.error(e); },
+        },
+      });
+    } catch (e) {
+      clearTimeout(timer); fallo();
+    }
+    brickBusy = false;
+    if (rehacer) { rehacer = false; montarBrick(); }
+  }
+
+  // ── PayPal (USD): el total se lee al momento de tocar el botón ──
+  function montarPayPal() {
+    if (ppListo) return;
+    var msg = $('ppmsg');
+    if (typeof paypal === 'undefined') { msg.style.color = '#B91C1C'; msg.textContent = 'No se pudo cargar PayPal. Revisá tu conexión.'; return; }
+    ppListo = true;
+    paypal.Buttons({
+      style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 48 },
+      onClick: function (d, actions) {
+        if (!emailValido()) { $('email-err').hidden = false; $('email').focus(); return actions.reject(); }
+        return actions.resolve();
+      },
+      createOrder: function (d, actions) {
+        return actions.order.create({ purchase_units: [{ description: 'VAMA Academy — Plata en Orden' + (conBump ? ' + Plan fondo de emergencia' : ''), amount: { value: totalUsd().toFixed(2), currency_code: 'USD' } }] });
+      },
+      onApprove: function (d, actions) {
+        msg.style.color = '#2563EB'; msg.textContent = '⏳ Procesando pago…';
+        return actions.order.capture().then(function (det) {
+          var mail = (det.payer && det.payer.email_address) || email();
+          return VAMA.api('/payment/paypal', { method: 'POST', body: { email: mail, orderID: d.orderID, courseId: PRODUCTO, bump: conBump } }).then(function (res) {
+            if (res.ok) location.href = '/plata-en-orden/gracias/';
+            else { msg.style.color = '#B91C1C'; msg.textContent = 'Tu pago se acreditó pero no pudimos habilitar el acceso solos. Escribinos a hola@vamatienda.com.ar con tu email y lo resolvemos.'; }
+          });
+        });
+      },
+      onError: function () { msg.style.color = '#B91C1C'; msg.textContent = '⚠️ Error al procesar el pago. Intentá de nuevo.'; },
+    }).render('#paypal_container');
+  }
+
+  window.cambiarTab = function (t) {
+    tab = t;
+    $('tab-mp').classList.toggle('active', t === 'mp'); $('tab-pp').classList.toggle('active', t === 'pp');
+    $('mp-section').hidden = t !== 'mp'; $('pp-section').hidden = t !== 'pp';
+    if (t === 'pp') montarPayPal(); else montarBrick();
+  };
+
+  // ── Eventos ──
+  $('bump').addEventListener('change', function () { conBump = this.checked; pintar(); if (tab === 'mp') montarBrick(); });
+  var deb; $('email').addEventListener('input', function () { clearTimeout(deb); deb = setTimeout(function () { if (emailValido() && tab === 'mp') montarBrick(); }, 600); });
+
+  // Email precargado desde el lead (?email=, o el guardado en este navegador).
+  (function () {
+    var q = new URLSearchParams(location.search).get('email'), guardado = '';
+    try { guardado = (JSON.parse(VAMA.store('vama_lead') || '{}').email) || ''; } catch (e) {}
+    $('email').value = q || guardado || '';
+  })();
+  pintar();
+  VAMA.track('InitiateCheckout', { value: C.PRECIO, currency: 'ARS', content_name: 'Plata en Orden' });
+  if (emailValido()) montarBrick();
+})();
+</script>
+</body>
+</html>
