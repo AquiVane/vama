@@ -110,6 +110,9 @@
     return { fbp: VAMA.cookie('_fbp'), fbc: VAMA.cookie('_fbc'), client_user_agent: navigator.userAgent, event_source_url: location.href, vid: VAMA.vid(), lead_email: email() };
   }
 
+  // La página de gracias muestra la oferta extra a nombre de quien compró.
+  function graciasUrl(extra) { return '/plata-en-orden/gracias/?nombre=' + encodeURIComponent($('nombre').value.trim().split(' ')[0]) + '&email=' + encodeURIComponent(email()) + extra; }
+
   function pintar() {
     if (!P) return;
     $('l-base').textContent = VAMA.money(ars(PRODUCTO));
@@ -178,9 +181,9 @@
                 if (d.status === 'approved') {
                   msg.style.color = '#16a34a'; msg.textContent = '✅ ¡Pago aprobado! Te llevamos a tu confirmación…';
                   $('paymentBrick_container').style.display = 'none';
-                  setTimeout(function () { location.href = '/plata-en-orden/gracias/'; }, 1500);
+                  setTimeout(function () { location.href = graciasUrl(''); }, 1500);
                 } else if (d.status === 'in_process' || d.status === 'pending') {
-                  location.href = '/plata-en-orden/gracias/?estado=pendiente';
+                  location.href = graciasUrl('&estado=pendiente');
                 } else {
                   msg.style.color = '#B91C1C'; msg.textContent = '⚠️ No se pudo procesar el pago. Revisá los datos e intentá de nuevo.';
                 }
@@ -219,7 +222,7 @@
         return actions.order.capture().then(function (det) {
           var mail = (det.payer && det.payer.email_address) || email();
           return VAMA.api('/payment/paypal', { method: 'POST', body: { email: mail, orderID: d.orderID, courseId: PRODUCTO, bump: conBump, vid: VAMA.vid() } }).then(function (res) {
-            if (res.ok) location.href = '/plata-en-orden/gracias/';
+            if (res.ok) location.href = graciasUrl('');
             else { msg.style.color = '#B91C1C'; msg.textContent = 'Tu pago se acreditó pero no pudimos habilitar el acceso solos. Escribinos a hola@vamatienda.com.ar con tu email y lo resolvemos.'; }
           });
         });

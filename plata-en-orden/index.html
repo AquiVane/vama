@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Ordená tus pesos y tus dólares en 15 minutos por semana, con la planilla hecha para la Argentina.">
 <title>Plata en Orden</title>
+<link rel="icon" href="/img/plata-en-orden.svg" type="image/svg+xml">
+<link rel="icon" href="/img/plata-en-orden-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/img/plata-en-orden-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&display=swap">
 <style>
@@ -119,13 +122,15 @@ h2{margin:0 0 16px;font-size:clamp(34px,4.6vw,54px);line-height:1.08;color:var(-
 .timer small{font-size:12px;color:#fff;opacity:.85}
 .oferta-vencida .solo-oferta{display:none!important}
 .price .timer{text-align:center;align-items:center}
+.brand img{display:block;height:26px;width:auto}
+@media (max-width:420px){.brand img{height:19px}.nav a{padding:10px 14px;font-size:13px}}
 </style>
 </head>
 <body>
 
 <header class="dark">
   <div class="wrap nav">
-    <div class="brand">VAMA ACADEMY</div>
+    <div class="brand"><img src="/img/vama-academy-logo.png" alt="VAMA Academy" width="198" height="22"></div>
     <a href="#precio">Quiero la planilla</a>
   </div>
   <div class="wrap hero">
@@ -135,7 +140,7 @@ h2{margin:0 0 16px;font-size:clamp(34px,4.6vw,54px);line-height:1.08;color:var(-
         <h1 class="serif">¿Sentís que la plata se te esfuma cada mes?</h1>
         <p class="lead">Ordená tus pesos y tus dólares en 15 minutos por semana, con la planilla hecha para la Argentina.</p>
         <a class="cta light" href="#precio">Quiero ordenar mi plata</a>
-        <ul class="checks"><li>✓ Pesos y dólares</li><li>✓ Cuotas de tarjeta</li><li>✓ Google Sheets y Excel</li><li>✓ Acceso inmediato</li></ul>
+        <ul class="checks"><li>✓ Pesos y dólares</li><li>✓ Cuotas de tarjeta</li><li>✓ Google Sheets y Excel</li><li>✓ App para el celu incluida</li><li>✓ Acceso inmediato</li></ul>
       </div>
       <div class="sheet" aria-label="Vista previa de la planilla con datos de ejemplo">
         <div class="sheet-h"><span>Presupuesto · Septiembre</span><span class="pill">50 / 30 / 20</span></div>
@@ -182,6 +187,7 @@ h2{margin:0 0 16px;font-size:clamp(34px,4.6vw,54px);line-height:1.08;color:var(-
       <div class="feat"><h3>Fondo de emergencia</h3><p>Calculado con tus gastos reales, con barra de progreso.</p></div>
       <div class="feat"><h3>Resumen anual con inflación</h3><p>Comparás tus meses de verdad, a valores de enero.</p></div>
     </div>
+    <div class="feat" style="margin-top:22px;background:var(--dark);color:#fff"><h3 style="color:#fff">Y viene con app.</h3><p style="color:#fff">Cargá cada gasto desde el celu en 5 segundos y mirá cuánto te queda del mes, sin abrir la computadora. Se conecta con tu planilla: lo que cargás en la app aparece en la planilla, y al revés.</p></div>
     <p class="phone"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1E8A50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>Funciona desde el celu, con la app de Google Sheets.</p>
   </div>
 </section>
@@ -226,7 +232,7 @@ h2{margin:0 0 16px;font-size:clamp(34px,4.6vw,54px);line-height:1.08;color:var(-
     <div class="pricebox">
       <div>
         <p class="kick">TODO LO QUE RECIBÍS</p>
-        <ul class="incl"><li>✓ Planilla Plata en Orden (Sheets y Excel)</li><li>✓ Guía “Ordená tu plata en 7 días”</li><li>✓ Tutorial paso a paso</li><li>✓ Actualizaciones incluidas</li></ul>
+        <ul class="incl"><li>✓ Planilla Plata en Orden (Sheets y Excel)</li><li>✓ App Plata en Orden para el celu</li><li>✓ Guía “Ordená tu plata en 7 días”</li><li>✓ Tutorial paso a paso</li><li>✓ Actualizaciones incluidas</li></ul>
       </div>
       <div class="price">
         <p class="note" style="font-weight:500">Pago único</p>
@@ -246,8 +252,7 @@ h2{margin:0 0 16px;font-size:clamp(34px,4.6vw,54px);line-height:1.08;color:var(-
           <button class="cta" type="submit">Continuar al pago</button>
           <p class="note">Te enviamos el acceso a ese email apenas se acredite el pago.</p>
         </form>
-        <p class="preview" id="aviso" hidden><b>Vista previa:</b> en academy.vamatienda.com.ar acá se guardan tus datos y pasás al checkout con Mercado Pago, tarjeta o PayPal.</p>
-        <p class="note">Mercado Pago, tarjeta o PayPal</p>
+                <p class="note">Mercado Pago, tarjeta o PayPal</p>
       </div>
     </div>
   </div>
@@ -261,6 +266,7 @@ h2{margin:0 0 16px;font-size:clamp(34px,4.6vw,54px);line-height:1.08;color:var(-
       <div class="faq"><h3>¿Funciona en el celular?</h3><p>Sí, con la app de Google Sheets.</p></div>
       <div class="faq"><h3>¿Cómo la recibo?</h3><p>Al instante, en tu email y en tu acceso a la plataforma.</p></div>
       <div class="faq"><h3>¿Es asesoramiento financiero?</h3><p>No. Es una herramienta de organización con contenido educativo.</p></div>
+      <div class="faq"><h3>¿Cómo funciona la app?</h3><p>Se instala desde el navegador en Android y iPhone, sin tiendas. Entrás con el email de tu compra y la conectás con tu planilla de Google Sheets.</p></div>
       <div class="faq"><h3>¿Puedo pagar con Mercado Pago?</h3><p>Sí, y también con tarjeta o PayPal.</p></div>
     </div>
   </div>
