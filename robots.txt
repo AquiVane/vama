@@ -6,3 +6,4 @@ Disallow: /plata-en-orden/checkout/
 Disallow: /plata-en-orden/gracias/
 Disallow: /cursos/
 Disallow: /plata-en-orden/acceso/
+Disallow: /app/
