@@ -7,6 +7,9 @@ body{margin:0;background:var(--ivory);color:var(--ink);font:400 17px/1.55 'DM Sa
 .top{background:var(--dark);color:#fff}
 .top .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:18px}
 .brand{font-weight:700;letter-spacing:.18em;font-size:13px;color:#fff;text-decoration:none}
+.brand img{display:block;height:26px;width:auto}
+@media (max-width:420px){.brand img{height:19px}.top a.link,.top button.link{padding:8px 12px;font-size:13px}.top .wrap{gap:8px}}
+.brand{min-width:0;flex-shrink:1}.brand img{max-width:100%}
 .top a.link{color:#fff;text-decoration:none;font-weight:700;font-size:14px;border:1.5px solid rgba(255,255,255,.6);border-radius:99px;padding:10px 16px;white-space:nowrap}
 .top a.link:hover{background:rgba(255,255,255,.1)}
 main{padding-block:clamp(28px,5vw,64px)}
