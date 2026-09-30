@@ -2,6 +2,9 @@
 <html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Planilla para ordenar tus pesos y dólares."><title>Plata en Orden · VAMA Academy</title>
+<link rel="icon" href="/img/plata-en-orden.svg" type="image/svg+xml">
+<link rel="icon" href="/img/plata-en-orden-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/img/plata-en-orden-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&display=swap"><style>
 :root{--dark:#1E3A34;--acc:#1E8A50;--acc-h:#176B3E;--mint:#7FE0A8;--light:#EAF6EF;--ivory:#FAF9F5;--ink:#1F2933;--muted:#4B5563;--line:#E3E8E5;--yel:#FFF4CC;color-scheme:light}
@@ -163,6 +166,10 @@ a.cat:hover{border-color:var(--acc)}
 
 .price .was{font-size:15px}.price .off{align-self:center}
 .sticky .sp{display:flex;flex-direction:column;line-height:1.2}.sticky .sp s{color:#6B7280;font-size:13px}.sticky .sp small{font-size:12px;color:#B42318;font-weight:700}
+.sticky .sp small.usds,.usds{font-size:12px;color:#4B5563;font-weight:700;white-space:nowrap}
+.hm .usdl{color:#fff;opacity:.85}
+.brand img{display:block;height:26px;width:auto}
+@media (max-width:420px){.brand img{height:21px}}
 
 .was{font-size:18px;color:#6B7280;text-decoration:line-through;font-variant-numeric:tabular-nums}
 .off{font-size:12px;font-weight:700;letter-spacing:.06em;background:#B42318;color:#fff;padding:4px 9px;border-radius:99px}
@@ -173,7 +180,7 @@ a.cat:hover{border-color:var(--acc)}
 </style></head>
 <body class="prod">
 <header class="top"><div class="wrap nav">
-<a class="brand" href="/">VAMA ACADEMY</a>
+<a class="brand" href="/"><img src="/img/vama-academy-logo.png" alt="VAMA Academy" width="198" height="22"></a>
 <nav class="links" aria-label="Principal"><a href="/">Tienda</a><a class="ghost" href="/cursos">Mi acceso</a></nav>
 </div></header>
 <main class="wrap">
@@ -191,13 +198,13 @@ a.cat:hover{border-color:var(--acc)}
 <p class="eyebrow" style="margin:0">Finanzas personales · Planilla</p>
 <h1 class="serif">Plata en Orden</h1>
 <p class="lead">Sabé en qué se va tu plata cada mes, en pesos y en dólares, con 15 minutos por semana.</p>
-<ul class="keys"><li>Presupuesto 50/30/20 que se calcula solo</li><li>Tus cuotas de tarjeta de los próximos 12 meses</li><li>Tus dólares: cuántos, dónde y cuánto valen hoy</li></ul>
+<ul class="keys"><li>Presupuesto 50/30/20 que se calcula solo</li><li>Tus cuotas de tarjeta de los próximos 12 meses</li><li>App para cargar gastos desde el celu, conectada a tu planilla</li></ul>
 <div class="buy"><div class="row solo-oferta"><span class="was">$29.900</span><span class="off">50% OFF de lanzamiento</span></div>
 <div class="row"><span class="amt serif" data-lista="$29.900">$14.900</span><span class="usd">pago único · o <s class="solo-oferta">USD 21,90</s> <span data-lista="USD 21,90">USD 10,90</span> con PayPal</span></div>
 <div class="timer solo-oferta" role="timer">El precio de lanzamiento termina en<b data-timer>07d : 00h : 00m : 00s</b><small>Después vuelve a $29.900 (USD 21,90).</small></div>
 <a class="cta" href="/plata-en-orden/checkout">Comprar ahora</a>
 <p class="note">Acceso inmediato · Mercado Pago (tarjeta o dinero en cuenta) · PayPal</p></div>
-<div class="meta"><span>Google Sheets y Excel</span><span>Funciona en el celu</span><span>Guía PDF + video</span></div>
+<div class="meta"><span>Google Sheets y Excel</span><span>App para el celu</span><span>Guía PDF + video</span></div>
 </div>
 </div>
 
@@ -212,6 +219,7 @@ a.cat:hover{border-color:var(--acc)}
 <section class="psec"><h2 class="serif">Qué incluye</h2>
 <div class="two">
 <div class="box"><h3>Planilla Plata en Orden</h3><p>8 pestañas: Empezá acá, Presupuesto (12 meses), Ingresos, Gastos, Cuotas, Mis dólares, Metas y Resumen anual con ajuste por inflación. Viene con ejemplos para que veas cómo funciona.</p></div>
+<div class="box"><h3>App Plata en Orden para el celu</h3><p>Cargá cada gasto desde el celu en 5 segundos y mirá cuánto te queda del mes, sin abrir la computadora. Se conecta con tu planilla: lo que cargás en la app aparece en la planilla, y al revés.</p></div>
 <div class="box"><h3>Guía “Ordená tu plata en 7 días”</h3><p>PDF con un paso por día, 15 minutos, y una tarea concreta para arrancar.</p></div>
 <div class="box"><h3>Tutorial en video</h3><p>Dos minutos que muestran cómo usar cada pestaña.</p></div>
 <div class="box"><h3>Actualizaciones</h3><p>Si mejoramos la planilla, te llega la versión nueva sin costo.</p></div>
@@ -243,7 +251,7 @@ a.cat:hover{border-color:var(--acc)}
 <div style="max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:10px"><a class="cta" href="/plata-en-orden/checkout">Comprar ahora</a></div>
 </section>
 </main>
-<div class="sticky" aria-label="Comprar"><div class="sp"><span><s class="solo-oferta">$29.900</s> <b data-lista="$29.900">$14.900</b> <small style="font-weight:500">· <span data-lista="USD 21,90">USD 10,90</span></small></span><small class="solo-oferta">Termina en <span data-timer-corto>7d 0h 00m</span></small></div><a class="cta" href="/plata-en-orden/checkout">Comprar ahora</a></div>
+<div class="sticky" aria-label="Comprar"><div class="sp"><span><s class="solo-oferta">$29.900</s> <b data-lista="$29.900">$14.900</b> <small class="usds" data-lista="USD 21,90">USD 10,90</small></span><small class="solo-oferta">Termina en <span data-timer-corto>7d 0h 00m</span></small></div><a class="cta" href="/plata-en-orden/checkout">Comprar ahora</a></div>
 <footer><div class="wrap">Contenido educativo. No constituye asesoramiento financiero, contable ni impositivo.<br>VAMA ACADEMY · academy.vamatienda.com.ar</div></footer>
 <script src="/assets/vama.js"></script>
 <script>VAMA.ofertaInit("plata-en-orden");</script>
