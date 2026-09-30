@@ -252,7 +252,7 @@ nav.tabs button[aria-current="page"]{color:var(--dark);border-top-color:var(--ac
   <div class="feat"><span class="lock">PRO</span><b>En todos tus dispositivos</b><p>Tus datos en el celu, la tablet y la compu, siempre iguales.</p></div>
   <div class="price"><div class="big serif" id="pv-ars">$3.900<span style="font-size:18px"> /mes</span></div><p class="sub" style="margin:4px 0 0" id="pv-usd">o USD 2,99 por mes con PayPal</p></div>
   <button class="btn" type="button" id="pro-btn">Pasarme a Pro</button>
-  <p class="legal">Se renueva automáticamente cada mes. Cancelás cuando quieras desde Mi cuenta, con el botón “Dar de baja”.</p>
+  <p class="legal" id="pro-legal">Se renueva automáticamente cada mes. Cancelás cuando quieras desde Mi cuenta, con el botón “Dar de baja”.</p>
   </div>
 
   <div id="pro-app" hidden>
@@ -627,6 +627,9 @@ function refrescarMe(){return api("/api/app/me",{auth:true}).then(function(r){if
 // ── Pestaña Pro ──
 var subPro="cuotas";
 function renderPro(){var pro=esPro();$("pro-venta").hidden=pro;$("pro-app").hidden=!pro;
+  var tr=!pro&&S.pro&&S.pro.estado==="trial"&&S.pro.hasta>Date.now();
+  $("pro-btn").textContent=tr?"Cargar mi tarjeta y usar Pro":"Pasarme a Pro";
+  $("pro-legal").textContent=tr?"Tenés 3 meses de Pro incluidos con tu combo. Cargás tu tarjeta o tu PayPal y hoy no se te cobra nada: pasados los 3 meses ("+fmtFecha(S.pro.hasta)+") se cobra $3.900 por mes de forma automática. Cancelás cuando quieras desde Mi cuenta.":"Se renueva automáticamente cada mes. Cancelás cuando quieras desde Mi cuenta, con el botón “Dar de baja”.";
   if(!pro){var p=(S.pro&&S.pro.precios)||{ars:3900,usd:2.99,normalArs:3900,normalUsd:2.99,primerMes:false};
     $("pv-ars").innerHTML=ars(p.ars).replace("$ ","$")+'<span style="font-size:18px"> '+(p.primerMes?"el primer mes":"/mes")+'</span>';
     $("pv-usd").textContent="o USD "+p.usd.toLocaleString("es-AR",{minimumFractionDigits:2})+" "+(p.primerMes?"el primer mes":"por mes")+" con PayPal"+(p.primerMes?". Después "+ars(p.normalArs).replace("$ ","$")+" / USD "+p.normalUsd.toLocaleString("es-AR",{minimumFractionDigits:2})+" por mes.":"");
