@@ -710,7 +710,7 @@ $("f-meta").addEventListener("submit",function(e){e.preventDefault();var n=$("me
 
 // ── Mi cuenta ──
 function renderCuenta(){var p=S.pro||{},h='';
-  if(p.estado==="trial")h='<b>Plata en Orden Pro · incluido en tu combo</b><p class="sub" style="margin:6px 0 0">Tenés Pro hasta el '+fmtFecha(p.hasta)+'. Después no se te cobra nada, salvo que actives la renovación.</p>';
+  if(p.estado==="trial")h='<b>Plata en Orden Pro · incluido en tu combo</b><p class="sub" style="margin:6px 0 0">Tenés Pro hasta el '+fmtFecha(p.hasta)+'. Para seguir después, activá la suscripción acá abajo: recién se cobra $3.900 al terminar los 3 meses, no antes. Cancelás cuando quieras.</p>';
   else if(p.estado==="activa")h='<b>Plata en Orden Pro · suscripción activa</b><p class="sub" style="margin:6px 0 0">Medio: '+(p.medio==="paypal"?"PayPal":"Mercado Pago")+'. Próxima renovación: alrededor del '+fmtFecha(Math.max(Date.now(),(p.hasta||0)-3*864e5))+'.</p>';
   else if(p.estado==="baja")h='<b>Baja pedida</b><p class="sub" style="margin:6px 0 0">No se te va a cobrar más. Tenés Pro hasta el '+fmtFecha(p.hasta)+'.</p>';
   $("cta-estado").innerHTML=h||'<b>Plata en Orden Pro</b>';
@@ -726,7 +726,7 @@ var brickPro=null,payModo="mp",ppListo=false;
 function payMsg(t,cls){var m=$("pay-msg");m.textContent=t;m.className="msg "+(cls||"");}
 function proListo(pro){S.pro=pro;save();$("pro-pago").hidden=true;renderPro();toast("Ya tenés Pro");pullDatos().then(function(){pushSoon();});}
 function mostrarPago(){var p=(S.pro&&S.pro.precios)||{},tr=S.pro&&S.pro.estado==="trial"&&S.pro.hasta>Date.now();
-  $("pro-pago").hidden=false;$("pay-trial").hidden=!tr;if(tr)$("pay-trial").textContent="Tu suscripción empieza a cobrarse cuando terminen tus 3 meses incluidos ("+fmtFecha(S.pro.hasta)+").";
+  $("pro-pago").hidden=false;$("pay-trial").hidden=!tr;if(tr)$("pay-trial").textContent="Hoy no se te cobra nada. Luego de los 3 meses incluidos ("+fmtFecha(S.pro.hasta)+") se cobra $3.900 por mes hasta que la des de baja.";
   $("pro-pago").scrollIntoView({block:"start"});setPago("mp");}
 function setPago(m){payModo=m;document.querySelectorAll("[data-pm]").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.pm===m)});$("pay-mp").hidden=m!=="mp";$("pay-pp").hidden=m!=="pp";payMsg("");
   if(m==="mp")montarBrickPro();else montarPaypalSub();}
