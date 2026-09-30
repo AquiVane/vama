@@ -95,6 +95,10 @@ nav.tabs button[aria-current="page"]{color:var(--dark);border-top-color:var(--ac
 .feat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 64px 14px 14px;margin-top:10px;position:relative}
 .feat b{color:var(--dark)}.feat p{margin:4px 0 0;font-size:14px;color:var(--muted)}
 .feat .lock{position:absolute;top:12px;right:12px}
+.pro-sub{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px}
+.pro-sub button{font:inherit;font-size:14px;font-weight:700;border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:8px 14px;cursor:pointer;color:var(--ink);min-height:40px;white-space:nowrap}
+.pro-sub button[aria-pressed="true"]{background:var(--dark);color:#fff;border-color:var(--dark)}
+.legal{font-size:13px;color:var(--muted);margin:10px 0 0}
 .price{text-align:center;margin-top:18px}
 .price .big{font-size:36px;color:var(--dark);font-variant-numeric:tabular-nums}
 .legal{font-size:13px;color:var(--muted);text-align:center;margin:10px 0 0}
@@ -112,12 +116,15 @@ nav.tabs button[aria-current="page"]{color:var(--dark);border-top-color:var(--ac
 <main id="v-login" class="login">
   <div class="logo" aria-hidden="true"><svg width="38" height="38" viewBox="0 0 38 38"><rect x="5" y="22" width="6" height="11" rx="2" fill="#7FE0A8" opacity=".55"/><rect x="16" y="15" width="6" height="18" rx="2" fill="#7FE0A8" opacity=".8"/><rect x="27" y="7" width="6" height="26" rx="2" fill="#7FE0A8"/></svg></div>
   <h1 class="serif">Tu plata, en orden</h1>
-  <p class="sub">Entrá con el email con el que compraste la planilla.</p>
+  <p class="sub">Entrá con el email con el que compraste la planilla. Es el mismo usuario y contraseña de tus cursos.</p>
   <form id="f-login" novalidate>
     <label for="l-email">Email</label>
     <input id="l-email" type="email" autocomplete="email" inputmode="email" required>
-    <p class="err" id="l-err" hidden>Revisá que el email esté bien escrito.</p>
+    <label for="l-pass">Contraseña</label>
+    <input id="l-pass" type="password" autocomplete="current-password" required>
+    <p class="err" id="l-err" hidden>Completá tu email y tu contraseña.</p>
     <button class="btn" type="submit">Entrar</button>
+    <p style="text-align:center;margin:14px 0 0"><a href="#" id="l-olvide" style="color:var(--acc)">Olvidé mi contraseña</a></p>
     <p class="note" id="l-nota" hidden role="status"></p>
   </form>
 </main>
@@ -236,22 +243,105 @@ nav.tabs button[aria-current="page"]{color:var(--dark);border-top-color:var(--ac
 
 <!-- PRO -->
 <main id="v-pro" hidden>
+  <div id="pro-venta">
   <div class="pro-hero"><p style="margin:0;font-size:12px;letter-spacing:.14em;font-weight:700;color:#7FE0A8">PLATA EN ORDEN PRO</p><h1 class="serif">Tu plata, un paso adelante</h1><p>Cuotas, dólares, metas y un simulador para decidir con tus números.</p></div>
   <div class="feat"><span class="lock">PRO</span><b>Mis cuotas</b><p>Cargás tus compras en cuotas y ves cuánto de tus próximos sueldos ya está comprometido.</p></div>
   <div class="feat"><span class="lock">PRO</span><b>Mis dólares</b><p>Cuántos tenés, dónde, a qué precio promedio y cuánto valen hoy, con la cotización del día.</p></div>
   <div class="feat"><span class="lock">PRO</span><b>Simulador</b><p>¿Dónde pongo mis pesos este mes? Compará plazo fijo, dólar y fondos con tus números. Contenido educativo, no es una recomendación de inversión.</p></div>
   <div class="feat"><span class="lock">PRO</span><b>Metas de ahorro</b><p>Poné un objetivo y seguí tu avance con una barra de progreso.</p></div>
   <div class="feat"><span class="lock">PRO</span><b>En todos tus dispositivos</b><p>Tus datos en el celu, la tablet y la compu, siempre iguales.</p></div>
-  <div class="price"><div class="big serif">$3.900<span style="font-size:18px"> /mes</span></div><p class="sub" style="margin:4px 0 0">o USD 2,99 por mes con PayPal</p></div>
+  <div class="price"><div class="big serif" id="pv-ars">$3.900<span style="font-size:18px"> /mes</span></div><p class="sub" style="margin:4px 0 0" id="pv-usd">o USD 2,99 por mes con PayPal</p></div>
   <button class="btn" type="button" id="pro-btn">Pasarme a Pro</button>
   <p class="legal">Se renueva automáticamente cada mes. Cancelás cuando quieras desde Mi cuenta, con el botón “Dar de baja”.</p>
-  <p class="note" id="pro-nota" hidden><b>Vista previa:</b> acá se abre el pago de la suscripción con Mercado Pago o PayPal.</p>
+  </div>
+
+  <div id="pro-app" hidden>
+    <div class="pro-sub" id="pro-sub" role="group" aria-label="Funciones Pro">
+      <button type="button" data-p="cuotas">Cuotas</button><button type="button" data-p="dolares">Dólares</button><button type="button" data-p="simu">Simulador</button><button type="button" data-p="metas">Metas</button><button type="button" data-p="cuenta">Mi cuenta</button>
+    </div>
+
+    <section id="p-cuotas" hidden>
+      <h1 class="serif">Mis cuotas</h1>
+      <p class="sub">Cargá tus compras en cuotas y mirá cuánto de tus próximos sueldos ya está comprometido.</p>
+      <div class="kpis"><div class="kpi"><small>Este mes pagás</small><b id="cu-mes"></b></div><div class="kpi"><small>Próximo mes</small><b id="cu-prox"></b></div></div>
+      <div class="tipo"><div class="h"><b>Comprometido de tu ingreso</b><span id="cu-pct"></span></div><div class="track"><div class="fill" id="cu-fill" style="width:0"></div></div><p class="msg" id="cu-msg"></p></div>
+      <form id="f-cuota" class="card" style="margin-top:12px" novalidate>
+        <label for="cu-nom">Compra</label><input id="cu-nom" maxlength="60" placeholder="Ej: heladera">
+        <div class="grid2"><div><label for="cu-tar">Tarjeta</label><input id="cu-tar" maxlength="30" placeholder="Ej: Visa"></div><div><label for="cu-ini">Mes de la 1ª cuota</label><input id="cu-ini" type="month"></div></div>
+        <div class="grid2"><div><label for="cu-can">Cantidad de cuotas</label><input id="cu-can" inputmode="numeric" placeholder="Ej: 12"></div><div><label for="cu-val">Valor de la cuota ($)</label><input id="cu-val" inputmode="decimal" placeholder="Ej: 45.000"></div></div>
+        <p class="err" id="cu-err" hidden></p><button class="btn" type="submit">Agregar</button>
+      </form>
+      <h2 class="serif">Tus compras en cuotas</h2><div class="card" id="cu-lista"></div>
+      <h2 class="serif">Próximos 12 meses</h2><div class="card" id="cu-12"></div>
+    </section>
+
+    <section id="p-dolares" hidden>
+      <h1 class="serif">Mis dólares</h1>
+      <p class="sub">Cuántos tenés, dónde están y cuánto valen hoy.</p>
+      <div class="kpis"><div class="kpi"><small>Dólares que tenés</small><b id="us-tengo"></b></div><div class="kpi"><small>Precio promedio de compra</small><b id="us-prom"></b></div><div class="kpi"><small>Valen hoy en pesos</small><b id="us-valen"></b></div><div class="kpi"><small>Diferencia vs. lo que pagaste</small><b id="us-dif"></b></div></div>
+      <div class="card" style="margin-top:12px"><label for="us-casa">Cotización del día</label><select id="us-casa"><option value="oficial">Dólar oficial</option><option value="blue">Dólar blue</option><option value="bolsa">Dólar MEP</option><option value="contadoconliqui">Dólar CCL</option><option value="tarjeta">Dólar tarjeta</option></select>
+        <label for="us-cot">Valor de venta ($ por US$)</label><input id="us-cot" inputmode="decimal"><p class="sub" id="us-fecha" style="margin:6px 0 0"></p></div>
+      <form id="f-usd" class="card" style="margin-top:12px" novalidate>
+        <div class="seg" role="group" aria-label="Operación"><button type="button" data-op="Compra" aria-pressed="true">Compra</button><button type="button" data-op="Venta" aria-pressed="false">Venta</button></div>
+        <div class="grid2"><div><label for="us-usd">Dólares</label><input id="us-usd" inputmode="decimal" placeholder="Ej: 100"></div><div><label for="us-pre">Precio ($ por US$)</label><input id="us-pre" inputmode="decimal"></div></div>
+        <div class="grid2"><div><label for="us-fec">Fecha</label><input id="us-fec" type="date"></div><div><label for="us-don">¿Dónde están?</label><select id="us-don"><option>Banco</option><option>Broker / ALyC</option><option>Billetera virtual</option><option>Efectivo</option><option>Otro</option></select></div></div>
+        <p class="err" id="us-err" hidden></p><button class="btn" type="submit">Agregar</button>
+      </form>
+      <h2 class="serif">¿Dónde están?</h2><div class="card" id="us-donde"></div>
+      <h2 class="serif">Movimientos</h2><div class="card" id="us-movs"></div>
+    </section>
+
+    <section id="p-simu" hidden>
+      <h1 class="serif">Simulador</h1>
+      <p class="sub">¿Dónde pongo mis pesos este mes? Compará con tus números.</p>
+      <form id="f-simu" class="card" novalidate>
+        <label for="si-mon">Monto en pesos ($)</label><input id="si-mon" inputmode="decimal" placeholder="Ej: 1.000.000">
+        <div class="grid2"><div><label for="si-dias">Plazo (días)</label><input id="si-dias" inputmode="numeric" placeholder="Ej: 30"></div><div><label for="si-inf">Inflación del período (%)</label><input id="si-inf" inputmode="decimal" placeholder="Ej: 1,7"></div></div>
+        <div class="grid2"><div><label for="si-pf">TNA plazo fijo (%)</label><input id="si-pf" inputmode="decimal"></div><div><label for="si-fo">TNA fondo (%)</label><input id="si-fo" inputmode="decimal"></div></div>
+        <div class="grid2"><div><label for="si-cot">Dólar hoy ($)</label><input id="si-cot" inputmode="decimal"></div><div><label for="si-dev">Suba del dólar en el período (%)</label><input id="si-dev" inputmode="decimal" placeholder="Ej: 1"></div></div>
+        <p class="err" id="si-err" hidden></p><button class="btn" type="submit">Simular</button>
+      </form>
+      <div id="si-out"></div>
+      <p class="legal">Contenido educativo. No es una recomendación de inversión ni promete rentabilidad. Los resultados dependen de los datos que cargues.</p>
+    </section>
+
+    <section id="p-metas" hidden>
+      <h1 class="serif">Metas de ahorro</h1>
+      <p class="sub">Poné un objetivo y seguí tu avance.</p>
+      <form id="f-meta" class="card" novalidate>
+        <label for="me-nom">Meta</label><input id="me-nom" maxlength="60" placeholder="Ej: vacaciones">
+        <div class="grid2"><div><label for="me-obj">Objetivo ($)</label><input id="me-obj" inputmode="decimal"></div><div><label for="me-ya">Ya ahorrado ($)</label><input id="me-ya" inputmode="decimal" placeholder="0"></div></div>
+        <label for="me-fin">Fecha objetivo</label><input id="me-fin" type="month">
+        <p class="err" id="me-err" hidden></p><button class="btn" type="submit">Agregar meta</button>
+      </form>
+      <div id="me-lista"></div>
+    </section>
+
+    <section id="p-cuenta" hidden>
+      <h1 class="serif">Mi cuenta</h1>
+      <div class="card" id="cta-estado"></div>
+      <button class="btn" type="button" id="cta-activar" hidden>Activar la renovación</button>
+      <button class="btn sec" type="button" id="cta-baja" hidden>Dar de baja</button>
+      <p class="msg" id="cta-msg" style="margin-top:12px"></p>
+    </section>
+  </div>
+
+  <div id="pro-pago" class="card" hidden>
+    <h2 class="serif" style="margin-top:0">Pasarte a Pro</h2>
+    <p class="msg warn" id="pay-trial" hidden></p>
+    <div class="seg" id="pay-seg" role="group" aria-label="Medio de pago"><button type="button" data-pm="mp" aria-pressed="true">Pesos (ARS)</button><button type="button" data-pm="pp" aria-pressed="false">PayPal (USD)</button></div>
+    <div id="pay-mp"><div id="brickpro" style="margin-top:12px"></div></div>
+    <div id="pay-pp" hidden><div id="ppsub" style="min-height:120px;margin-top:12px"></div></div>
+    <p class="legal" style="margin-top:12px">Se renueva automáticamente cada mes. Cancelás cuando quieras desde Mi cuenta, con el botón “Dar de baja”.</p>
+    <p class="msg" id="pay-msg"></p>
+  </div>
 </main>
 
 <nav class="tabs" id="tabs" hidden aria-label="Secciones">
   <button type="button" data-v="cargar">Cargar</button>
   <button type="button" data-v="mes">Mi mes</button>
   <button type="button" data-v="rec">Recursos</button>
+  <button type="button" data-v="pro">Pro</button>
 </nav>
 <div class="toast" id="toast" role="status" hidden></div>
 <div class="tour" id="tour" hidden role="dialog" aria-modal="true" aria-labelledby="t-tit"><div class="box">
@@ -268,7 +358,7 @@ var MESES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Se
 var KEY="plata_en_orden_app_v1";
 var S={email:"",token:"",ingreso:0,dolar:0,gastos:[]};
 try{var raw=localStorage.getItem(KEY);if(raw){var o=JSON.parse(raw);if(o&&Array.isArray(o.gastos))S=o;}}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(typeof pushSoon==="function")pushSoon();}
 
 // Números en formato argentino: "1.500.000", "1500,50", "1.500,5", "12.5"
 function num(t){t=String(t||"").trim().replace(/[$\sUS]/g,"");if(!t)return NaN;
@@ -293,29 +383,38 @@ function show(v){VIEWS.forEach(function(k){$("v-"+k).hidden=k!==v});
   if(v==="mes")renderMes(); if(v==="rec"){$("a-ing").value=S.ingreso?S.ingreso.toLocaleString("es-AR"):"";$("a-dol").value=S.dolar?S.dolar.toLocaleString("es-AR"):"";}
   if(v==="cargar")resetGasto();
   if(v==="anio")renderAnio();
+  if(v==="pro")renderPro();
   window.scrollTo(0,0);}
 document.querySelectorAll("#tabs button").forEach(function(b){b.addEventListener("click",function(){show(b.dataset.v)})});
 
 // Login
-// Login por link al email (sin contraseña). Solo entran quienes compraron la planilla.
+// Login: el mismo usuario y contraseña que /cursos (misma sesión). Solo entran quienes compraron la planilla.
 var CORE="https://cosmart-training-core.conglomeradocosmart.workers.dev";
 function api(path,opt){opt=opt||{};var h={"Content-Type":"application/json"};if(opt.auth&&S.token)h.Authorization="Bearer "+S.token;
   return fetch(CORE+path,{method:opt.method||"GET",headers:h,body:opt.body?JSON.stringify(opt.body):undefined}).then(function(r){return r.json().catch(function(){return {}}).then(function(j){return {ok:r.ok,status:r.status,data:j}})});}
 function entrar(){show(S.ingreso>0&&S.dolar>0?"cargar":"setup");}
-$("f-login").addEventListener("submit",function(e){e.preventDefault();var v=$("l-email").value.trim().toLowerCase();
-  var ok=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);$("l-err").hidden=ok;if(!ok)return;
-  var b=$("f-login").querySelector("button[type=submit]");b.disabled=true;
-  api("/api/app/login",{method:"POST",body:{email:v}}).then(function(){
-    var n=$("l-nota");n.hidden=false;n.textContent="Si ese email corresponde a una compra, te mandamos un link para entrar. Revisá tu bandeja de entrada y el spam.";
-  }).catch(function(){var n=$("l-nota");n.hidden=false;n.textContent="No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.";})
-  .then(function(){b.disabled=false;});});
+function guardarToken(t){S.token=t;try{if(t)localStorage.setItem("vama_token",t);else localStorage.removeItem("vama_token");}catch(e){}}
+function notaL(el,t){var n=$(el);n.hidden=false;n.textContent=t;}
+$("f-login").addEventListener("submit",function(e){e.preventDefault();var v=$("l-email").value.trim().toLowerCase(),p=$("l-pass").value;
+  var ok=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)&&p.length>0;$("l-err").hidden=ok;if(!ok)return;
+  var b=$("f-login").querySelector("button[type=submit]");b.disabled=true;$("l-nota").hidden=true;
+  api("/auth/login",{method:"POST",body:{email:v,password:p}}).then(function(r){
+    if(!r.ok||!r.data.token){notaL("l-nota",r.data.error||"Email o contraseña incorrectos.");return;}
+    guardarToken(r.data.token);
+    return api("/api/app/me",{auth:true}).then(function(m){
+      if(!m.ok){guardarToken("");notaL("l-nota","Esta app es para quienes compraron Plata en Orden.");return;}
+      S.email=v;S.pro=m.data.pro||null;S.libro=!!m.data.libro;$("l-pass").value="";save();entrar();pullDatos();});
+  }).catch(function(){notaL("l-nota","No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.");}).then(function(){b.disabled=false;});});
+$("l-olvide").addEventListener("click",function(e){e.preventDefault();var v=$("l-email").value.trim().toLowerCase();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){notaL("l-nota","Escribí tu email arriba y volvé a tocar “Olvidé mi contraseña”.");return;}
+  api("/auth/forgot",{method:"POST",body:{email:v}}).then(function(){notaL("l-nota","Si el email tiene cuenta, te llega un link para crear una contraseña nueva en unos minutos.");}).catch(function(){notaL("l-nota","No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.");});});
 
 // Setup
 $("f-setup").addEventListener("submit",function(e){e.preventDefault();var i=num($("s-ing").value),d=num($("s-dol").value);
   var ok=i>0&&d>0;$("s-err").hidden=ok;if(!ok)return;S.ingreso=i;S.dolar=d;save();show("cargar");if(!S.tour)abrirTour();});
 $("f-aj").addEventListener("submit",function(e){e.preventDefault();var i=num($("a-ing").value),d=num($("a-dol").value);
   var ok=i>0&&d>0;$("a-err").hidden=ok;if(!ok)return;S.ingreso=i;S.dolar=d;save();toast("Ajustes guardados");});
-function cerrarSesion(){if(S.token)api("/auth/logout",{method:"POST",auth:true}).catch(function(){});S.email="";S.token="";save();$("l-email").value="";show("login");}
+function cerrarSesion(){if(S.token)api("/auth/logout",{method:"POST",auth:true}).catch(function(){});S.email="";S.pro=null;guardarToken("");save();$("l-email").value="";show("login");}
 $("salir").addEventListener("click",cerrarSesion);
 
 // Cargar
@@ -341,7 +440,10 @@ $("m-prev").addEventListener("click",function(){vm--;if(vm<0){vm=11;vy--}renderM
 $("m-next").addEventListener("click",function(){vm++;if(vm>11){vm=0;vy++}renderMes()});
 // Ingreso del mes: el real de la planilla si está conectada; si no, el que cargó en Ajustes.
 function ingDe(p){return S.ingMes&&S.ingMes[p]!=null?S.ingMes[p]:(S.ingreso||0);}
-function delMes(){var p=vy+"-"+String(vm+1).padStart(2,"0");return S.gastos.filter(function(g){return g.fecha.slice(0,7)===p}).sort(function(a,b){return a.fecha<b.fecha?1:-1})}
+function delMes(){var p=vy+"-"+String(vm+1).padStart(2,"0");var L=S.gastos.filter(function(g){return g.fecha.slice(0,7)===p});
+  // Con Pro, las cuotas de tarjeta del mes suman solas a "Tarjeta - cuotas" (no se guardan como gasto: no se cuentan dos veces).
+  var cu=window.__cuotasMes?window.__cuotasMes(p):0;if(cu>0)L=L.concat([{id:"cuotas-"+p,virtual:true,fecha:p+"-01",desc:"Cuotas de tarjeta",cat:"Tarjeta - cuotas",mon:"ARS",monto:cu,cot:null,medio:"Tarjeta de crédito"}]);
+  return L.sort(function(a,b){return a.fecha<b.fecha?1:-1})}
 function calc(list){var t={N:0,D:0,A:0},c={};list.forEach(function(g){var v=enPesos(g),tp=TIPO[g.cat]||"D";t[tp]=r2(t[tp]+v);c[g.cat]=r2((c[g.cat]||0)+v)});return {t:t,c:c}}
 window.__calc=function(){return calc(delMes())};
 function renderMes(){$("m-tit").textContent=MESES[vm]+" "+vy;var L=delMes(),R=calc(L),I=ingDe(vy+"-"+String(vm+1).padStart(2,"0"));
@@ -354,10 +456,10 @@ function renderMes(){$("m-tit").textContent=MESES[vm]+" "+vy;var L=delMes(),R=ca
     return '<div class="tipo"><div class="h"><b>'+TN[k]+' · '+Math.round(PCT[k]*100)+'%</b><span>'+ars(v)+' de '+ars(lim)+'</span></div><div class="track"><div class="fill '+cls+'" style="width:'+Math.min(100,Math.round(p*100))+'%"></div></div>'+msg+'</div>'}).join("");
   var cs=Object.keys(R.c).sort(function(a,b){return R.c[b]-R.c[a]});
   $("m-cats").innerHTML=cs.length?cs.map(function(c){return '<div class="row"><span class="l"><b>'+c+'</b><small>'+TX[TIPO[c]||"D"]+'</small></span><span class="r">'+ars(R.c[c])+'</span></div>'}).join(""):'<p class="empty">Todavía no cargaste gastos este mes.</p>';
-  $("m-movs").innerHTML=L.length?L.map(function(g){var f=g.fecha.split("-");return '<div class="row" data-id="'+g.id+'"><span class="l"><b>'+(g.desc||g.cat)+'</b><small>'+f[2]+"/"+f[1]+' · '+g.cat+' · '+g.medio+'</small><br><button type="button" class="del" data-del="'+g.id+'">Borrar</button></span><span class="r">'+(g.mon==="USD"?usd(g.monto)+'<br><small>'+ars(enPesos(g))+'</small>':ars(g.monto))+'</span></div>'}).join(""):'<p class="empty">Sin movimientos.</p>';
+  $("m-movs").innerHTML=L.length?L.map(function(g){var f=g.fecha.split("-");return '<div class="row" data-id="'+g.id+'"><span class="l"><b>'+(g.desc||g.cat)+'</b><small>'+f[2]+"/"+f[1]+' · '+g.cat+' · '+g.medio+'</small>'+(g.virtual?'':'<br><button type="button" class="del" data-del="'+g.id+'">Borrar</button>')+'</span><span class="r">'+(g.mon==="USD"?usd(g.monto)+'<br><small>'+ars(enPesos(g))+'</small>':ars(g.monto))+'</span></div>'}).join(""):'<p class="empty">Sin movimientos.</p>';
   $("m-movs").querySelectorAll("[data-del]").forEach(function(b){b.addEventListener("click",function(){
     if(b.dataset.ok){var g=S.gastos.filter(function(x){return x.id===b.dataset.del})[0];
-      var quitar=function(){S.gastos=S.gastos.filter(function(x){return x.id!==b.dataset.del});save();renderMes();toast("Gasto borrado");};
+      var quitar=function(){if(typeof borrado==="function")borrado(b.dataset.del);S.gastos=S.gastos.filter(function(x){return x.id!==b.dataset.del});save();renderMes();toast("Gasto borrado");};
       if(g&&g.fila&&S.sheet&&GACTIVO){borrarDeSheet(g).then(quitar).catch(function(){window.sincronizar().then(renderMes).catch(function(){});});}else quitar();}
     else{b.dataset.ok="1";b.textContent="Tocá de nuevo para confirmar";}})});}
 
@@ -493,16 +595,169 @@ function bajarRecurso(a){if(a.dataset.res==="Planilla (Google Sheets)"&&LINK_COP
   }).catch(function(e){if(e.message!=="sesion")nota(e.message==="Failed to fetch"?"No pudimos conectarnos. Revisá tu conexión.":e.message);});}
 document.querySelectorAll("[data-res]").forEach(function(a){a.addEventListener("click",function(e){e.preventDefault();bajarRecurso(a);})});
 
-// Arranque: link del email (?t=...) o sesión guardada
-(function(){var t=new URLSearchParams(location.search).get("t");
-  function limpiar(){try{history.replaceState(null,"","/app/")}catch(e){}}
-  if(t){limpiar();api("/api/app/sesion",{method:"POST",body:{token:t}}).then(function(r){
-      if(r.ok&&r.data.token){S.token=r.data.token;S.email=r.data.email;save();entrar();}
-      else{show("login");var n=$("l-nota");n.hidden=false;n.textContent=r.data.error||"El link venció o ya se usó. Pedí uno nuevo.";}
-    }).catch(function(){show("login");});return;}
-  if(S.email&&S.token){entrar();api("/api/app/me",{auth:true}).then(function(r){if(r.status===401||r.status===403)cerrarSesion();}).catch(function(){});
+// ══ PLATA EN ORDEN PRO ══
+var MP_KEY="APP_USR-057d290b-5af9-4b00-8a08-6753dc47aec4",PP_ID="AYuQX3JJShvSkgNn0C195h3GEHGiKNtx44X3wd_5PEoBI1iinpysmDzNRqdZ7blNuZvFWIwcwhc9qiOP";
+S.cuotas=S.cuotas||[];S.usd=S.usd||{ops:[],casa:"oficial",cot:0,fecha:""};S.metas=S.metas||[];S.simu=S.simu||{};S.del=S.del||[];
+function esPro(){return !!(S.pro&&S.pro.activo&&(!S.pro.hasta||S.pro.hasta>Date.now()));}
+function ym(y,m){return y+"-"+String(m+1).padStart(2,"0");}
+function mesesEntre(a,b){var x=a.split("-"),y=b.split("-");return (+y[0]-+x[0])*12+(+y[1]-+x[1]);}
+function sumarMes(p,n){var x=p.split("-"),d=new Date(+x[0],+x[1]-1+n,1);return ym(d.getFullYear(),d.getMonth());}
+function nombreMes(p){var x=p.split("-");return MESES[+x[1]-1].slice(0,3)+" "+x[0];}
+function fmtFecha(ms){var d=new Date(ms);return d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear();}
+function borrado(id){if(S.del.indexOf(id)<0)S.del.push(id);}
+
+// Sincronización entre dispositivos (solo Pro): se sube el estado y se mezcla por id (nada que se borró vuelve a aparecer).
+var pushT=null;
+function datosSync(){return {ingreso:S.ingreso,dolar:S.dolar,gastos:S.gastos.filter(function(g){return g.origen!=="sheet"}),cuotas:S.cuotas,usd:S.usd,metas:S.metas,simu:S.simu,del:S.del};}
+function pushSoon(){if(!esPro()||!S.token)return;clearTimeout(pushT);pushT=setTimeout(function(){api("/api/app/datos",{method:"PUT",auth:true,body:{datos:datosSync()}}).catch(function(){});},1500);}
+function unir(a,b,ids){var m={};(b||[]).concat(a||[]).forEach(function(x){if(x&&x.id&&ids.indexOf(x.id)<0)m[x.id]=x;});return Object.keys(m).map(function(k){return m[k]});}
+function pullDatos(){if(!esPro()||!S.token)return Promise.resolve();
+  return api("/api/app/datos",{auth:true}).then(function(r){var d=r.ok&&r.data.datos&&r.data.datos.datos;if(!d)return pushSoon();
+    var del=(S.del||[]).concat(d.del||[]).filter(function(x,i,a){return a.indexOf(x)===i});S.del=del;
+    var sheet=S.gastos.filter(function(g){return g.origen==="sheet"});
+    S.gastos=sheet.concat(unir(S.gastos.filter(function(g){return g.origen!=="sheet"}),d.gastos,del));
+    S.cuotas=unir(S.cuotas,d.cuotas,del);S.metas=unir(S.metas,d.metas,del);
+    var ops=unir(S.usd.ops,(d.usd||{}).ops,del);S.usd=Object.assign({},d.usd||{},S.usd,{ops:ops});
+    if(!S.ingreso&&d.ingreso)S.ingreso=d.ingreso;if(!S.dolar&&d.dolar)S.dolar=d.dolar;if(!Object.keys(S.simu).length&&d.simu)S.simu=d.simu;
+    save();}).catch(function(){});}
+
+// Estado de la cuenta (y precios) desde el servidor
+function refrescarMe(){return api("/api/app/me",{auth:true}).then(function(r){if(r.status===401||r.status===403){cerrarSesion();return;}if(r.ok){S.pro=r.data.pro||null;S.libro=!!r.data.libro;save();}}).catch(function(){});}
+
+// ── Pestaña Pro ──
+var subPro="cuotas";
+function renderPro(){var pro=esPro();$("pro-venta").hidden=pro;$("pro-app").hidden=!pro;
+  if(!pro){var p=(S.pro&&S.pro.precios)||{ars:3900,usd:2.99,normalArs:3900,normalUsd:2.99,primerMes:false};
+    $("pv-ars").innerHTML=ars(p.ars).replace("$ ","$")+'<span style="font-size:18px"> '+(p.primerMes?"el primer mes":"/mes")+'</span>';
+    $("pv-usd").textContent="o USD "+p.usd.toLocaleString("es-AR",{minimumFractionDigits:2})+" "+(p.primerMes?"el primer mes":"por mes")+" con PayPal"+(p.primerMes?". Después "+ars(p.normalArs).replace("$ ","$")+" / USD "+p.normalUsd.toLocaleString("es-AR",{minimumFractionDigits:2})+" por mes.":"");
+    return;}
+  document.querySelectorAll("#pro-sub button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.p===subPro)});
+  ["cuotas","dolares","simu","metas","cuenta"].forEach(function(k){$("p-"+k).hidden=k!==subPro;});
+  if(subPro==="cuotas")renderCuotas();if(subPro==="dolares")renderDolares();if(subPro==="simu")initSimu();if(subPro==="metas")renderMetas();if(subPro==="cuenta")renderCuenta();}
+document.querySelectorAll("#pro-sub button").forEach(function(b){b.addEventListener("click",function(){subPro=b.dataset.p;renderPro();window.scrollTo(0,0);});});
+$("tabs").querySelector('[data-v="pro"]')||0;
+
+// ── Mis cuotas ──
+function cuotaEn(c,p){var i=mesesEntre(c.mes,p);return i>=0&&i<c.cant?c.valor:0;}
+function totalCuotas(p){return S.cuotas.reduce(function(t,c){return t+cuotaEn(c,p)},0);}
+window.__cuotasMes=function(p){return esPro()?totalCuotas(p):0;};
+function renderCuotas(){var hoyM=ym(new Date().getFullYear(),new Date().getMonth()),prox=sumarMes(hoyM,1);
+  $("cu-mes").textContent=ars(totalCuotas(hoyM));$("cu-prox").textContent=ars(totalCuotas(prox));
+  var I=ingDe(hoyM),t=totalCuotas(hoyM),p=I>0?t/I:0;$("cu-pct").textContent=I>0?Math.round(p*100)+"%":"—";
+  $("cu-fill").style.width=Math.min(100,Math.round(p*100))+"%";$("cu-fill").className="fill"+(p>.3?" bad":p>=.2?" warn":"");
+  $("cu-msg").className="msg "+(p>.3?"bad":p>=.2?"warn":"ok");
+  $("cu-msg").textContent=I<=0?"Cargá tu ingreso en Ajustes para ver qué parte ya está comprometida.":(p>.3?"Pasás del 30% de tus ingresos: la regla es simple, no sumes cuotas nuevas hasta bajarlo.":"Vas bien: estás por debajo del 30% de tus ingresos.");
+  $("cu-lista").innerHTML=S.cuotas.length?S.cuotas.map(function(c){var rest=Math.max(0,c.cant-Math.max(0,mesesEntre(c.mes,hoyM)));
+    return '<div class="row"><span class="l"><b>'+esc(c.nombre)+'</b><small>'+esc(c.tarjeta||"Tarjeta")+' · desde '+nombreMes(c.mes)+' · '+c.cant+' cuotas · quedan '+rest+'</small><br><button type="button" class="del" data-cdel="'+c.id+'">Borrar</button></span><span class="r">'+ars(c.valor)+'</span></div>'}).join(""):'<p class="empty">Todavía no cargaste compras en cuotas.</p>';
+  $("cu-lista").querySelectorAll("[data-cdel]").forEach(function(b){b.addEventListener("click",function(){if(b.dataset.ok){borrado(b.dataset.cdel);S.cuotas=S.cuotas.filter(function(c){return c.id!==b.dataset.cdel});save();renderCuotas();}else{b.dataset.ok="1";b.textContent="Tocá de nuevo para confirmar";}});});
+  var f="";for(var i=0;i<12;i++){var q=sumarMes(hoyM,i),v=totalCuotas(q),ing=ingDe(q),pp=ing>0?Math.round(v/ing*100):0;f+='<div class="row"><span class="l"><b>'+nombreMes(q)+'</b></span><span class="r">'+ars(v)+(ing>0?' <small>'+pp+'%</small>':'')+'</span></div>';}
+  $("cu-12").innerHTML=f;}
+$("f-cuota").addEventListener("submit",function(e){e.preventDefault();var n=$("cu-nom").value.trim(),can=parseInt($("cu-can").value,10),val=num($("cu-val").value),ini=$("cu-ini").value,err="";
+  if(!n)err="Poné qué compraste.";else if(!ini)err="Elegí el mes de la primera cuota.";else if(!(can>0&&can<=72))err="Poné la cantidad de cuotas (hasta 72).";else if(!(val>0))err="Poné el valor de la cuota.";
+  $("cu-err").textContent=err;$("cu-err").hidden=!err;if(err)return;
+  S.cuotas.push({id:"c"+Date.now()+Math.random().toString(36).slice(2,5),nombre:n,tarjeta:$("cu-tar").value.trim(),mes:ini,cant:can,valor:r2(val)});save();
+  ["cu-nom","cu-tar","cu-ini","cu-can","cu-val"].forEach(function(i){$(i).value=""});toast("Cuota agregada");renderCuotas();});
+
+// ── Mis dólares ──
+var opTipo="Compra";
+document.querySelectorAll("[data-op]").forEach(function(b){b.addEventListener("click",function(){opTipo=b.dataset.op;document.querySelectorAll("[data-op]").forEach(function(x){x.setAttribute("aria-pressed",x.dataset.op===opTipo)});});});
+function resumenUsd(){var ops=S.usd.ops,c=0,v=0,cp=0;ops.forEach(function(o){if(o.tipo==="Compra"){c+=o.usd;cp+=o.usd*o.precio;}else v+=o.usd;});var tengo=r2(c-v),prom=c>0?cp/c:0,cot=S.usd.cot||S.dolar||0;
+  return {tengo:tengo,prom:prom,cot:cot,valen:tengo*cot,dif:tengo*(cot-prom)};}
+window.__resumenUsd=resumenUsd;
+function renderDolares(){var R=resumenUsd();$("us-tengo").textContent=usd(R.tengo);$("us-prom").textContent=R.prom?ars(R.prom):"—";$("us-valen").textContent=R.cot?ars(R.valen):"—";$("us-dif").textContent=R.cot&&R.prom?ars(R.dif):"—";
+  $("us-dif").style.color=R.dif<0?"var(--bad)":"";$("us-casa").value=S.usd.casa||"oficial";$("us-cot").value=S.usd.cot?S.usd.cot.toLocaleString("es-AR"):"";
+  $("us-fecha").textContent=S.usd.fecha?"Actualizada: "+S.usd.fecha:"Ingresá la cotización o elegí una de la lista.";if(!$("us-fec").value)$("us-fec").value=hoy();
+  var dd={};S.usd.ops.forEach(function(o){dd[o.donde]=(dd[o.donde]||0)+(o.tipo==="Compra"?o.usd:-o.usd);});
+  $("us-donde").innerHTML=Object.keys(dd).length?Object.keys(dd).map(function(k){return '<div class="row"><span class="l"><b>'+esc(k)+'</b></span><span class="r">'+usd(r2(dd[k]))+'</span></div>'}).join(""):'<p class="empty">Todavía no cargaste operaciones.</p>';
+  var L=S.usd.ops.slice().sort(function(a,b){return a.fecha<b.fecha?1:-1});
+  $("us-movs").innerHTML=L.length?L.map(function(o){var f=o.fecha.split("-");return '<div class="row"><span class="l"><b>'+o.tipo+' · '+usd(o.usd)+'</b><small>'+f[2]+"/"+f[1]+' · a '+ars(o.precio)+' · '+esc(o.donde)+'</small><br><button type="button" class="del" data-odel="'+o.id+'">Borrar</button></span><span class="r">'+ars(o.usd*o.precio)+'</span></div>'}).join(""):'<p class="empty">Sin operaciones.</p>';
+  $("us-movs").querySelectorAll("[data-odel]").forEach(function(b){b.addEventListener("click",function(){if(b.dataset.ok){borrado(b.dataset.odel);S.usd.ops=S.usd.ops.filter(function(o){return o.id!==b.dataset.odel});save();renderDolares();}else{b.dataset.ok="1";b.textContent="Tocá de nuevo para confirmar";}});});}
+function traerCotizacion(){var casa=$("us-casa").value;S.usd.casa=casa;
+  return fetch("https://dolarapi.com/v1/dolares").then(function(r){return r.json()}).then(function(l){var d=l.filter(function(x){return x.casa===casa})[0];
+    if(d&&d.venta>0){S.usd.cot=r2(d.venta);S.usd.fecha=fmtFecha(d.fechaActualizacion?Date.parse(d.fechaActualizacion):Date.now());save();}renderDolares();}).catch(function(){renderDolares();});}
+$("us-casa").addEventListener("change",traerCotizacion);
+$("us-cot").addEventListener("change",function(){var v=num($("us-cot").value);if(v>0){S.usd.cot=r2(v);S.usd.fecha=fmtFecha(Date.now());save();renderDolares();}});
+$("f-usd").addEventListener("submit",function(e){e.preventDefault();var u=num($("us-usd").value),p=num($("us-pre").value),err="";
+  if(!(u>0))err="Poné cuántos dólares.";else if(!(p>0))err="Poné el precio por dólar.";else if(!$("us-fec").value)err="Elegí la fecha.";
+  $("us-err").textContent=err;$("us-err").hidden=!err;if(err)return;
+  S.usd.ops.push({id:"o"+Date.now()+Math.random().toString(36).slice(2,5),tipo:opTipo,usd:r2(u),precio:r2(p),fecha:$("us-fec").value,donde:$("us-don").value});save();
+  $("us-usd").value="";$("us-pre").value="";toast("Operación agregada");renderDolares();});
+
+// ── Simulador (educativo: todo sale de los datos que cargue la persona) ──
+function simular(v){var t=v.dias/365,pf=v.mon*(1+v.pf/100*t),fo=v.mon*(1+v.fo/100*t),us=v.mon*(1+v.dev/100),inf=v.mon*(1+v.inf/100);
+  return {pf:pf,fo:fo,usd:us,inf:inf,realPf:(pf/inf-1)*100,realFo:(fo/inf-1)*100,realUsd:(us/inf-1)*100};}
+window.__simular=simular;
+function initSimu(){var s=S.simu||{};[["mon","si-mon"],["dias","si-dias"],["inf","si-inf"],["pf","si-pf"],["fo","si-fo"],["cot","si-cot"],["dev","si-dev"]].forEach(function(p){if(!$(p[1]).value&&s[p[0]]!=null)$(p[1]).value=s[p[0]];});
+  if(!$("si-cot").value&&(S.usd.cot||S.dolar))$("si-cot").value=(S.usd.cot||S.dolar).toLocaleString("es-AR");}
+$("f-simu").addEventListener("submit",function(e){e.preventDefault();var v={mon:num($("si-mon").value),dias:num($("si-dias").value),inf:num($("si-inf").value),pf:num($("si-pf").value),fo:num($("si-fo").value),cot:num($("si-cot").value),dev:num($("si-dev").value)};
+  var falta=!(v.mon>0)||!(v.dias>0)||isNaN(v.inf)||isNaN(v.pf)||isNaN(v.fo)||!(v.cot>0)||isNaN(v.dev);$("si-err").textContent="Completá todos los campos con números.";$("si-err").hidden=!falta;if(falta)return;
+  S.simu={mon:$("si-mon").value,dias:$("si-dias").value,inf:$("si-inf").value,pf:$("si-pf").value,fo:$("si-fo").value,cot:$("si-cot").value,dev:$("si-dev").value};save();
+  var R=simular(v),fila=function(n,fin,real,extra){return '<div class="tipo"><div class="h"><b>'+n+'</b><span>'+ars(fin)+'</span></div><p class="msg '+(real>0.1?"ok":real>=-0.1?"warn":"bad")+'">'+(real>0.1?"Le gana":real>=-0.1?"Empata con":"Pierde contra")+' la inflación ('+real.toLocaleString("es-AR",{maximumFractionDigits:2})+'%).'+(extra||"")+'</p></div>'};
+  $("si-out").innerHTML='<h2 class="serif">Resultado</h2>'+fila("Plazo fijo",R.pf,R.realPf)+fila("Fondo",R.fo,R.realFo)+fila("Dólares (US$ "+(v.mon/v.cot).toLocaleString("es-AR",{maximumFractionDigits:2})+")",R.usd,R.realUsd)+'<div class="tipo"><div class="h"><b>Para no perder poder de compra</b><span>'+ars(R.inf)+'</span></div></div>';});
+
+// ── Metas ──
+function renderMetas(){var hoyM=ym(new Date().getFullYear(),new Date().getMonth());
+  $("me-lista").innerHTML=S.metas.length?S.metas.map(function(m){var p=m.objetivo>0?Math.min(1,m.ahorrado/m.objetivo):0,falta=Math.max(0,m.objetivo-m.ahorrado),meses=m.fin?Math.max(1,mesesEntre(hoyM,m.fin)):0;
+    return '<div class="tipo"><div class="h"><b>'+esc(m.nombre)+'</b><span>'+ars(m.ahorrado)+' de '+ars(m.objetivo)+'</span></div><div class="track"><div class="fill'+(p>=1?"":"")+'" style="width:'+Math.round(p*100)+'%"></div></div><p class="msg '+(p>=1?"ok":"")+'">'+(p>=1?"¡Meta cumplida!":"Te faltan "+ars(falta)+(meses?" · "+ars(falta/meses)+" por mes hasta "+nombreMes(m.fin):""))+'</p>'+
+      '<div style="display:flex;gap:8px;margin-top:10px"><input inputmode="decimal" placeholder="Sumar ahorro ($)" data-msum="'+m.id+'" aria-label="Sumar ahorro a '+esc(m.nombre)+'"><button type="button" class="btn sm" data-madd="'+m.id+'">Sumar</button></div><button type="button" class="del" data-mdel="'+m.id+'">Borrar</button></div>'}).join(""):'<p class="empty">Todavía no tenés metas.</p>';
+  $("me-lista").querySelectorAll("[data-madd]").forEach(function(b){b.addEventListener("click",function(){var i=$("me-lista").querySelector('[data-msum="'+b.dataset.madd+'"]'),v=num(i.value);if(!(v>0))return;var m=S.metas.filter(function(x){return x.id===b.dataset.madd})[0];m.ahorrado=r2(m.ahorrado+v);save();renderMetas();});});
+  $("me-lista").querySelectorAll("[data-mdel]").forEach(function(b){b.addEventListener("click",function(){if(b.dataset.ok){borrado(b.dataset.mdel);S.metas=S.metas.filter(function(x){return x.id!==b.dataset.mdel});save();renderMetas();}else{b.dataset.ok="1";b.textContent="Tocá de nuevo para confirmar";}});});}
+$("f-meta").addEventListener("submit",function(e){e.preventDefault();var n=$("me-nom").value.trim(),o=num($("me-obj").value),y=$("me-ya").value?num($("me-ya").value):0,err="";
+  if(!n)err="Poné el nombre de la meta.";else if(!(o>0))err="Poné el objetivo.";else if(isNaN(y)||y<0)err="Revisá cuánto ya ahorraste.";
+  $("me-err").textContent=err;$("me-err").hidden=!err;if(err)return;
+  S.metas.push({id:"m"+Date.now()+Math.random().toString(36).slice(2,5),nombre:n,objetivo:r2(o),ahorrado:r2(y),fin:$("me-fin").value||""});save();
+  ["me-nom","me-obj","me-ya","me-fin"].forEach(function(i){$(i).value=""});toast("Meta agregada");renderMetas();});
+
+// ── Mi cuenta ──
+function renderCuenta(){var p=S.pro||{},h='';
+  if(p.estado==="trial")h='<b>Plata en Orden Pro · incluido en tu combo</b><p class="sub" style="margin:6px 0 0">Tenés Pro hasta el '+fmtFecha(p.hasta)+'. Después no se te cobra nada, salvo que actives la renovación.</p>';
+  else if(p.estado==="activa")h='<b>Plata en Orden Pro · suscripción activa</b><p class="sub" style="margin:6px 0 0">Medio: '+(p.medio==="paypal"?"PayPal":"Mercado Pago")+'. Próxima renovación: alrededor del '+fmtFecha(Math.max(Date.now(),(p.hasta||0)-3*864e5))+'.</p>';
+  else if(p.estado==="baja")h='<b>Baja pedida</b><p class="sub" style="margin:6px 0 0">No se te va a cobrar más. Tenés Pro hasta el '+fmtFecha(p.hasta)+'.</p>';
+  $("cta-estado").innerHTML=h||'<b>Plata en Orden Pro</b>';
+  $("cta-activar").hidden=!(p.estado==="trial"||p.estado==="baja");$("cta-baja").hidden=p.estado!=="activa";$("cta-baja").textContent="Dar de baja";delete $("cta-baja").dataset.ok;}
+$("cta-baja").addEventListener("click",function(){var b=$("cta-baja");if(!b.dataset.ok){b.dataset.ok="1";b.textContent="Tocá de nuevo para confirmar la baja";return;}
+  b.disabled=true;api("/api/pro/baja",{method:"POST",auth:true,body:{}}).then(function(r){var m=$("cta-msg");
+    if(r.ok){S.pro=r.data.pro;save();m.className="msg ok";m.textContent="Listo: no se te va a cobrar más. Mantenés Pro hasta donde ya pagaste.";renderCuenta();}
+    else{m.className="msg bad";m.textContent=r.data.error||"No pudimos dar de baja la suscripción. Intentá de nuevo.";}}).catch(function(){var m=$("cta-msg");m.className="msg bad";m.textContent="No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.";}).then(function(){b.disabled=false;});});
+$("cta-activar").addEventListener("click",function(){mostrarPago();});
+
+// ── Pago de la suscripción ──
+var brickPro=null,payModo="mp",ppListo=false;
+function payMsg(t,cls){var m=$("pay-msg");m.textContent=t;m.className="msg "+(cls||"");}
+function proListo(pro){S.pro=pro;save();$("pro-pago").hidden=true;renderPro();toast("Ya tenés Pro");pullDatos().then(function(){pushSoon();});}
+function mostrarPago(){var p=(S.pro&&S.pro.precios)||{},tr=S.pro&&S.pro.estado==="trial"&&S.pro.hasta>Date.now();
+  $("pro-pago").hidden=false;$("pay-trial").hidden=!tr;if(tr)$("pay-trial").textContent="Tu suscripción empieza a cobrarse cuando terminen tus 3 meses incluidos ("+fmtFecha(S.pro.hasta)+").";
+  $("pro-pago").scrollIntoView({block:"start"});setPago("mp");}
+function setPago(m){payModo=m;document.querySelectorAll("[data-pm]").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.pm===m)});$("pay-mp").hidden=m!=="mp";$("pay-pp").hidden=m!=="pp";payMsg("");
+  if(m==="mp")montarBrickPro();else montarPaypalSub();}
+document.querySelectorAll("[data-pm]").forEach(function(b){b.addEventListener("click",function(){setPago(b.dataset.pm);});});
+$("pro-btn").addEventListener("click",function(){mostrarPago();});
+function montarBrickPro(){if(brickPro)return;var p=(S.pro&&S.pro.precios)||{ars:3900};
+  cargarScript("https://sdk.mercadopago.com/js/v2").then(function(){var mp=new MercadoPago(MP_KEY,{locale:"es-AR"});
+    return mp.bricks().create("cardPayment","brickpro",{initialization:{amount:p.ars,payer:{email:S.email}},customization:{visual:{style:{theme:"default"}},paymentMethods:{maxInstallments:1}},
+      callbacks:{onReady:function(){},onError:function(e){console.error(e)},
+        onSubmit:function(x){return new Promise(function(res,rej){var fd=x&&x.formData?x.formData:x,id=(fd.payer&&fd.payer.identification)||{};
+          api("/api/pro/mp",{method:"POST",auth:true,body:{cardToken:fd.token,docType:id.type,docNumber:id.number}}).then(function(r){
+            if(r.ok){proListo(r.data.pro);res();}else{payMsg(r.data.error||"No se pudo procesar la suscripción. Revisá los datos e intentá de nuevo.","bad");rej();}}).catch(function(){payMsg("No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.","bad");rej();});});}}});
+  }).then(function(b){brickPro=b;}).catch(function(){payMsg("El formulario de pago está tardando en cargar. Volvé a tocar “Pesos (ARS)” para reintentar.","bad");});}
+function montarPaypalSub(){if(ppListo)return;
+  api("/api/pro/paypal-plan",{method:"POST",auth:true,body:{}}).then(function(r){if(!r.ok){payMsg(r.data.error||"No pudimos preparar PayPal. Intentá de nuevo.","bad");return;}
+    return cargarScript("https://www.paypal.com/sdk/js?client-id="+PP_ID+"&vault=true&intent=subscription").then(function(){ppListo=true;
+      paypal.Buttons({style:{layout:"vertical",color:"gold",shape:"rect",label:"subscribe",height:48},
+        createSubscription:function(d,a){return a.subscription.create(Object.assign({plan_id:r.data.planId},r.data.startTime?{start_time:r.data.startTime}:{}));},
+        onApprove:function(d){payMsg("Procesando…");return api("/api/pro/paypal",{method:"POST",auth:true,body:{subscriptionID:d.subscriptionID}}).then(function(x){
+          if(x.ok)proListo(x.data.pro);else payMsg(x.data.error||"Tu suscripción se creó pero todavía no la vemos activa. Escribinos a hola@vamatienda.com.ar.","bad");});},
+        onError:function(){payMsg("Error al procesar el pago. Intentá de nuevo.","bad");}}).render("#ppsub");});
+  }).catch(function(){payMsg("No se pudo cargar PayPal. Revisá tu conexión.","bad");});}
+
+// Arranque: sesión guardada (la misma de /cursos)
+(function(){
+  if(!S.token){try{S.token=localStorage.getItem("vama_token")||"";}catch(e){}}
+  if(S.token&&S.email){entrar();refrescarMe().then(function(){return pullDatos();}).then(function(){if(!$("v-mes").hidden)renderMes();});
     if(S.sheet&&GACTIVO)window.sincronizar().then(function(){if(!$("v-mes").hidden)renderMes();}).catch(function(){});return;}
-  S.email="";show("login");})();
+  if(S.token&&!S.email){api("/api/app/me",{auth:true}).then(function(m){if(m.ok){S.email=m.data.email;S.pro=m.data.pro||null;S.libro=!!m.data.libro;save();entrar();pullDatos();}else{guardarToken("");show("login");}}).catch(function(){show("login");});return;}
+  S.email="";show("login");
+})();
 })();
 </script>
 

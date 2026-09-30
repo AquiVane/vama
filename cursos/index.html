@@ -15,6 +15,12 @@ details.les summary::-webkit-details-marker{display:none}
 details.les .et{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--acc);white-space:nowrap}
 details.les .ck{margin-left:auto;font-size:18px}
 details.les .lb{padding:0 18px 18px}
+.ej{background:var(--light);border-radius:14px;padding:16px 18px;margin:14px 0}.ej h3{margin:0 0 12px;font-size:18px;color:var(--dark)}
+.ej-chk{display:flex;gap:10px;align-items:flex-start;margin:0 0 10px;font-weight:400;font-size:16px}.ej-chk input{margin-top:4px;width:20px;height:20px;flex:none;accent-color:var(--acc)}
+.ej select,.ej input[type=month],.ej input[type=date]{font:inherit;font-size:16px;padding:14px;border:1.5px solid #C9D3CE;border-radius:12px;width:100%;background:#fff;color:var(--ink)}
+.ej .card{padding:12px 14px}.ej .card small{color:var(--muted)}
+.app-card{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}.app-card>div{min-width:0;flex:1 1 240px}
+details.les .lb table{display:block;max-width:100%;overflow-x:auto;border-collapse:collapse}details.les .lb th,details.les .lb td{padding:8px 10px;border:1px solid var(--line);text-align:left;vertical-align:top;font-size:15px}details.les .lb .box{background:var(--light);border-radius:12px;padding:12px 16px;margin:12px 0}
 .tarea{background:var(--light);border-radius:12px;padding:12px 14px;margin:0 0 14px;color:var(--dark)}
 @media (max-width:600px){details.les summary{flex-wrap:wrap}}
 </style>
@@ -41,6 +47,7 @@ details.les .lb{padding:0 18px 18px}
 </div></main>
 <footer class="foot">Contenido educativo. No constituye asesoramiento financiero.<br>¿Necesitás ayuda? <a href="mailto:hola@vamatienda.com.ar">hola@vamatienda.com.ar</a></footer>
 <script src="/assets/vama.js"></script>
+<script src="/assets/ejercicios.js"></script>
 <script>
 var $ = function (i) { return document.getElementById(i); };
 var ICON = { xlsx: '📊', pdf: '📘', mp4: '🎬' };
@@ -49,6 +56,7 @@ var INFO = {
   'planilla-blanco': 'La misma planilla sin datos, lista para cargar la tuya. Se usa igual en Google Sheets (subila a Drive) o en Excel.',
   guia: 'Tu plan día por día para ordenar tu plata en una semana.',
   tutorial: 'Un recorrido de 2 minutos por la planilla.',
+  libro: 'El libro completo en PDF, para leer o descargar.',
   fondo: 'Tu bonus: 12 semanas, una acción por semana, para armar tu fondo de emergencia.'
 };
 var MODULOS = [
@@ -94,46 +102,66 @@ function tarjeta(it) {
 function esc(t) { return String(t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 function rich(t) { return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }
 
-// Lecciones de la guía (texto pago: viene del Worker, con sesión).
-function pintarLecciones(cont, lec, guia) {
-  var hechas = lec.hechas.slice();
+// Lecciones (texto pago: viene del Worker, con sesión). Sirve para la guía de 7 días (cuerpo en párrafos)
+// y para "Tus dólares, bien puestos" (cuerpo en HTML + ejercicios completables).
+function pintarLecciones(cont, lec, extra) {
+  var hechas = lec.hechas.slice(), curso = lec.curso, idDe = function (l) { return l.id || ('l' + l.n); };
   var wrap = document.createElement('div');
-  var total = lec.lecciones.length;
-  var barra = document.createElement('div'); barra.innerHTML = '<p class="muted" style="margin:0" id="prog-t"></p><div class="prog"><i id="prog-b"></i></div>';
+  var total = lec.lecciones.length, pid = 'p' + curso.replace(/[^a-z]/g, '');
+  if (lec.aviso) { var av = document.createElement('p'); av.className = 'msg warn'; av.textContent = lec.aviso; wrap.appendChild(av); }
+  var barra = document.createElement('div'); barra.innerHTML = '<p class="muted" style="margin:0" id="' + pid + '-t"></p><div class="prog"><i id="' + pid + '-b"></i></div>';
   wrap.appendChild(barra);
-  function progreso() { $('prog-t').textContent = hechas.length + ' de ' + total + ' lecciones completadas'; $('prog-b').style.width = Math.round(hechas.length * 100 / total) + '%'; }
+  function progreso() { $(pid + '-t').textContent = hechas.length + ' de ' + total + ' lecciones completadas'; $(pid + '-b').style.width = Math.round(hechas.length * 100 / total) + '%'; }
   lec.lecciones.forEach(function (l) {
+    var lid = idDe(l);
     var d = document.createElement('details'); d.className = 'les';
     var sm = document.createElement('summary');
     sm.innerHTML = '<span class="et"></span><span class="tt"></span><span class="ck" aria-hidden="true"></span>';
-    sm.querySelector('.et').textContent = l.etiqueta; sm.querySelector('.tt').textContent = l.titulo;
+    sm.querySelector('.et').textContent = l.etiqueta || ('Lección ' + l.n); sm.querySelector('.tt').textContent = l.titulo;
     var body = document.createElement('div'); body.className = 'lb';
-    body.innerHTML = l.cuerpo.map(function (p) { return '<p>' + rich(p) + '</p>'; }).join('') + (l.tarea ? '<p class="tarea"><b>Tarea:</b> ' + esc(l.tarea) + '</p>' : '');
-    var b = document.createElement('button'); b.type = 'button'; b.className = 'cta';
-    function marca() { var h = hechas.indexOf(l.id) >= 0; sm.querySelector('.ck').textContent = h ? '✅' : ''; b.textContent = h ? 'Marcar como pendiente' : 'Marcar como hecha'; b.className = h ? 'cta ghost' : 'cta'; }
+    if (l.html) body.innerHTML = l.html;   // contenido propio, viene del Worker
+    else body.innerHTML = l.cuerpo.map(function (p) { return '<p>' + rich(p) + '</p>'; }).join('') + (l.tarea ? '<p class="tarea"><b>Tarea:</b> ' + esc(l.tarea) + '</p>' : '');
+    if (l.ejercicio) {
+      var eb = document.createElement('div'); body.appendChild(eb);
+      VAMA_EJ.render(eb, l.ejercicio, l.n, (lec.ejercicios || {})[l.n], function (datos, mes) {
+        VAMA.api('/academy/ejercicio', { method: 'POST', auth: true, body: { curso: curso, n: l.n, datos: datos, mes: mes } }).catch(function () {});
+      });
+    }
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'cta'; b.style.marginTop = '8px';
+    function marca() { var h = hechas.indexOf(lid) >= 0; sm.querySelector('.ck').textContent = h ? '✅' : ''; b.textContent = h ? 'Marcar como pendiente' : 'Marcar como hecha'; b.className = (h ? 'cta ghost' : 'cta'); }
     b.onclick = function () {
-      var hecha = hechas.indexOf(l.id) < 0; b.disabled = true;
-      VAMA.api('/academy/leccion', { method: 'POST', auth: true, body: { id: l.id, hecha: hecha } }).then(function (r) {
+      var hecha = hechas.indexOf(lid) < 0; b.disabled = true;
+      VAMA.api('/academy/leccion', { method: 'POST', auth: true, body: { curso: curso, id: lid, hecha: hecha } }).then(function (r) {
         if (r.ok) hechas = r.data.hechas; marca(); progreso();
       }).catch(function () {}).then(function () { b.disabled = false; });
     };
     body.appendChild(b); d.appendChild(sm); d.appendChild(body); wrap.appendChild(d); marca();
   });
   cont.appendChild(wrap); progreso();
-  if (guia) cont.appendChild(tarjeta(guia));
+  if (extra) cont.appendChild(tarjeta(extra));
 }
 
-function pintar(data, lec) {
+function pintar(data, lec, libro) {
   vista(true);
   $('hola').textContent = data.nombre ? 'Hola, ' + data.nombre : 'Mis cursos';
   var cont = $('items'); cont.innerHTML = '';
   var porId = {}; data.items.forEach(function (it) { porId[it.id] = it; });
+  var tienePlata = data.items.some(function (it) { return it.curso === 'plata-en-orden'; });
+  if (tienePlata) {
+    var ap = document.createElement('div'); ap.className = 'card app-card'; ap.style.marginBottom = '12px';
+    ap.innerHTML = '<div><h2>📱 App Plata en Orden</h2><p class="muted" style="margin:0">Cargá cada gasto desde el celu en 5 segundos y mirá cuánto te queda del mes. Entrás con el mismo usuario y contraseña.</p></div><a class="cta" href="/app/">Descargar la app</a>';
+    cont.appendChild(ap);
+  }
   MODULOS.forEach(function (m) {
     var its = m.ids.map(function (i) { return porId[i]; }).filter(Boolean);
     if (!its.length) return;
     var h = document.createElement('p'); h.className = 'eyebrow'; h.style.margin = '28px 0 12px'; h.textContent = m.t; cont.appendChild(h);
     if (m.ids[0] === 'guia' && lec) pintarLecciones(cont, lec, porId.guia); else its.forEach(function (it) { cont.appendChild(tarjeta(it)); });
   });
+  if (porId.libro) {
+    var hl = document.createElement('p'); hl.className = 'eyebrow'; hl.style.margin = '28px 0 12px'; hl.textContent = 'Tus dólares, bien puestos'; cont.appendChild(hl);
+    if (libro) pintarLecciones(cont, libro, porId.libro); else cont.appendChild(tarjeta(porId.libro));
+  }
 }
 
 function cargar() {
@@ -141,8 +169,10 @@ function cargar() {
     if (r.status === 401) { salir(); return; }
     if (!r.ok) { vista(true); msg('aerr', 'No pudimos cargar tus archivos. Recargá la página.'); return; }
     // Lecciones: si fallan, queda la guía en PDF como recurso descargable.
-    VAMA.api('/academy/lecciones', { auth: true }).then(function (l) { pintar(r.data, l.ok && l.data.lecciones ? l.data : null); })
-      .catch(function () { pintar(r.data, null); });
+    var tieneLibro = r.data.items.some(function (it) { return it.curso === 'tus-dolares-bien-puestos'; });
+    Promise.all([VAMA.api('/academy/lecciones?curso=plata-en-orden', { auth: true }), tieneLibro ? VAMA.api('/academy/lecciones?curso=tus-dolares-bien-puestos', { auth: true }) : Promise.resolve(null)])
+      .then(function (L) { pintar(r.data, L[0].ok && L[0].data.lecciones ? L[0].data : null, L[1] && L[1].ok && L[1].data.lecciones ? L[1].data : null); })
+      .catch(function () { pintar(r.data, null, null); });
   }).catch(function () { vista(true); msg('aerr', 'Error de conexión. Recargá la página.'); });
 }
 function salir() {
