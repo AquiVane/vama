@@ -149,7 +149,7 @@ function pintar(data, lec, libro) {
   var tienePlata = data.items.some(function (it) { return it.curso === 'plata-en-orden'; });
   if (tienePlata) {
     var ap = document.createElement('div'); ap.className = 'card app-card'; ap.style.marginBottom = '12px';
-    ap.innerHTML = '<div><h2>📱 App Plata en Orden</h2><p class="muted" style="margin:0">Cargá cada gasto desde el celu en 5 segundos y mirá cuánto te queda del mes. Entrás con el mismo usuario y contraseña.</p></div><a class="cta" href="/app/">Descargar la app</a>';
+    ap.innerHTML = '<div><h2>📱 App Plata en Orden</h2><p class="muted" style="margin:0">Cargá cada gasto desde el celu en 5 segundos y mirá cuánto te queda del mes. Entrás con el mismo usuario y contraseña. <a href="/app/tutorial-instalar-app.pdf" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Cómo instalarla en tu celu (PDF)</a></p></div><a class="cta" href="/app/">Descargar la app</a>';
     cont.appendChild(ap);
   }
   MODULOS.forEach(function (m) {

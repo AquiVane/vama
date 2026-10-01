@@ -86,6 +86,7 @@ nav.tabs button[aria-current="page"]{color:var(--dark);border-top-color:var(--ac
 .row:last-child{border-bottom:0}
 .row .l{min-width:0}.row .l b{display:block;overflow-wrap:anywhere}.row .l small{color:var(--muted)}
 .row .r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pr-in{width:150px;flex:0 0 150px;text-align:right}.cat-bar{padding:10px 0;border-bottom:1px solid var(--line)}.cat-bar .h{display:flex;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;align-items:baseline}.cat-bar .track{margin:8px 0 4px}
 .del{font:inherit;font-size:13px;color:var(--bad);background:none;border:0;cursor:pointer;padding:6px 0 0;text-decoration:underline}
 .res a,.res button.link{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:10px;color:var(--ink);text-decoration:none;font:inherit;width:100%;text-align:left;cursor:pointer}
 .res b{display:block;color:var(--dark)}.res small{color:var(--muted)}
@@ -178,6 +179,15 @@ input[type=date],input[type=month]{min-width:0;max-width:100%;display:block;min-
   <button class="btn sec" type="button" id="m-anio">Ver mi año</button>
   <h2 class="serif">Tu 50 / 30 / 20</h2>
   <div id="m-tipos"></div>
+  <h2 class="serif">Presupuesto del mes</h2>
+  <div class="card" id="m-presu"></div>
+  <button class="btn sec" type="button" id="pr-edit">Armar mi presupuesto</button>
+  <div class="card" id="pr-box" hidden>
+    <p class="sub" style="margin:0 0 8px">Poné cuánto pensás gastar este mes en cada categoría. Los meses siguientes copian este presupuesto hasta que lo cambies.</p>
+    <div id="pr-list"></div>
+    <button class="btn sec" type="button" id="pr-sug">Sugerime uno con el 50/30/20</button>
+    <button class="btn" type="button" id="pr-save">Guardar presupuesto</button>
+  </div>
   <h2 class="serif">Por categoría</h2>
   <div class="card" id="m-cats"></div>
   <h2 class="serif">Movimientos</h2>
@@ -213,8 +223,9 @@ input[type=date],input[type=month]{min-width:0;max-width:100%;display:block;min-
   <p class="sub">Todo lo que compraste, siempre a mano.</p>
   <div class="res">
     <a href="#" data-res="Planilla (Google Sheets)"><span><b>Planilla Plata en Orden</b><small>Google Sheets: Archivo › Hacer una copia</small></span><span aria-hidden="true">›</span></a>
-    <a href="#" data-res="Planilla (Excel)"><span><b>Planilla en Excel</b><small>Descargá el .xlsx</small></span><span aria-hidden="true">›</span></a>
-    <a href="#" data-res="Planilla en blanco"><span><b>Planilla en blanco</b><small>Excel sin datos, lista para cargar la tuya</small></span><span aria-hidden="true">›</span></a>
+    <a href="#" data-res="Planilla (Excel)"><span><b>Planilla con ejemplos</b><small>Excel con datos de ejemplo ya cargados, para ver cómo funciona.</small></span><span aria-hidden="true">›</span></a>
+    <a href="#" data-res="Planilla en blanco"><span><b>Planilla en blanco</b><small>El mismo Excel vacío, para empezar con tus propios números.</small></span><span aria-hidden="true">›</span></a>
+    <a href="/app/tutorial-instalar-app.pdf" target="_blank" rel="noopener"><span><b>Cómo instalar la app</b><small>PDF con los pasos para Android y iPhone.</small></span><span aria-hidden="true">›</span></a>
     <a href="#" data-res="Video tutorial"><span><b>Video tutorial</b><small>Cómo usar cada pestaña · 2 min</small></span><span aria-hidden="true">›</span></a>
     <a href="#" data-res="Guía 7 días"><span><b>Guía “Ordená tu plata en 7 días”</b><small>PDF · un paso por día</small></span><span aria-hidden="true">›</span></a>
     <a href="#" data-res="Fondo 90 días"><span><b>Plan de 90 días: fondo de emergencia</b><small>PDF · si lo sumaste en tu compra</small></span><span aria-hidden="true">›</span></a>
@@ -358,6 +369,7 @@ var TIPO={};CATS.forEach(function(c){TIPO[c[0]]=c[1]});
 var TN={N:"Necesidades",D:"Deseos",A:"Ahorro"},PCT={N:.5,D:.3,A:.2},TX={N:"Necesidad",D:"Deseo",A:"Ahorro"};
 var MESES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 var KEY="plata_en_orden_app_v1";
+function pmes(){return vy+"-"+String(vm+1).padStart(2,"0");}
 var S={email:"",token:"",ingreso:0,dolar:0,gastos:[]};
 try{var raw=localStorage.getItem(KEY);if(raw){var o=JSON.parse(raw);if(o&&Array.isArray(o.gastos))S=o;}}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(typeof pushSoon==="function")pushSoon();}
@@ -449,6 +461,20 @@ function delMes(){var p=vy+"-"+String(vm+1).padStart(2,"0");var L=S.gastos.filte
   return L.sort(function(a,b){return a.fecha<b.fecha?1:-1})}
 function calc(list){var t={N:0,D:0,A:0},c={};list.forEach(function(g){var v=enPesos(g),tp=TIPO[g.cat]||"D";t[tp]=r2(t[tp]+v);c[g.cat]=r2((c[g.cat]||0)+v)});return {t:t,c:c}}
 window.__calc=function(){return calc(delMes())};
+// Presupuesto por categoría: S.presu = { "AAAA-MM": { categoría: monto } }. Cada mes copia el último que cargaste hasta que lo cambies.
+function presuDe(p){S.presu=S.presu||{};var ks=Object.keys(S.presu).filter(function(k){return k<=p}).sort().reverse(),o={};
+  CATS.forEach(function(c){for(var i=0;i<ks.length;i++){var v=S.presu[ks[i]][c[0]];if(v!=null){o[c[0]]=v;break;}}});return o;}
+function renderPresu(p,R){var B=presuDe(p),tot=0,usado=0;CATS.forEach(function(c){var b=B[c[0]]||0;if(b>0){tot+=b;usado+=R.c[c[0]]||0;}});
+  if(!(tot>0)){$("m-presu").innerHTML='<p class="empty">Todavía no armaste tu presupuesto de este mes.</p>';return B;}
+  var pc=usado/tot,cls=pc>1?"bad":pc>=.8?"warn":"";
+  $("m-presu").innerHTML='<div class="h" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 8px"><b>Presupuestado</b><span>'+ars(usado)+' de '+ars(tot)+'</span></div><div class="track"><div class="fill '+cls+'" style="width:'+Math.min(100,Math.round(pc*100))+'%"></div></div><p class="msg '+(pc>1?"bad":pc>=.8?"warn":"ok")+'">'+(pc>1?"Te pasaste "+ars(usado-tot)+".":"Te quedan "+ars(tot-usado)+".")+'</p>';
+  return B;}
+function abrirPresu(){var B=presuDe(pmes());$("pr-list").innerHTML=CATS.map(function(c,i){var v=B[c[0]];return '<div class="row"><span class="l"><b>'+c[0]+'</b><small>'+TX[c[1]]+'</small></span><input class="pr-in" id="pr-'+i+'" inputmode="decimal" placeholder="$ 0" aria-label="Presupuesto de '+c[0]+'" value="'+(v>0?v.toLocaleString("es-AR"):"")+'"></div>'}).join("");$("pr-box").hidden=false;$("pr-box").scrollIntoView({block:"start"});}
+$("pr-edit").addEventListener("click",function(){if($("pr-box").hidden)abrirPresu();else $("pr-box").hidden=true;});
+$("pr-sug").addEventListener("click",function(){var I=ingDe(pmes());if(!(I>0)){toast("Cargá tu ingreso en Ajustes");return;}
+  ["N","D","A"].forEach(function(t){var ids=[];CATS.forEach(function(c,i){if(c[1]===t)ids.push(i)});var por=Math.round(I*PCT[t]/ids.length/1000)*1000;ids.forEach(function(i){$("pr-"+i).value=por.toLocaleString("es-AR")});});});
+$("pr-save").addEventListener("click",function(){var o={};CATS.forEach(function(c,i){var v=num($("pr-"+i).value);o[c[0]]=v>0?Math.round(v):0;});
+  S.presu=S.presu||{};S.presu[pmes()]=o;save();$("pr-box").hidden=true;renderMes();toast("Presupuesto guardado");});
 function renderMes(){$("m-tit").textContent=MESES[vm]+" "+vy;var L=delMes(),R=calc(L),I=ingDe(vy+"-"+String(vm+1).padStart(2,"0"));
   var gas=Math.round(R.t.N+R.t.D),aho=Math.round(R.t.A),que=Math.round(I)-gas-aho;
   $("k-ing").textContent=ars(I);$("k-gas").textContent=ars(gas);$("k-aho").textContent=ars(aho);$("k-que").textContent=ars(que);
@@ -457,8 +483,12 @@ function renderMes(){$("m-tit").textContent=MESES[vm]+" "+vy;var L=delMes(),R=ca
     if(k==="A"){cls=p>=1?"":"warn";msg=p>=1?'<p class="msg ok">¡Llegaste a tu meta de ahorro!</p>':'<p class="msg warn">Te faltan '+ars(lim-v)+' para tu 20%.</p>';}
     else{cls=p>1?"bad":p>=.8?"warn":"";msg=p>1?'<p class="msg bad">Te pasaste '+ars(v-lim)+'.</p>':p>=.8?'<p class="msg warn">Te quedan '+ars(lim-v)+'. Ojo, estás cerca del límite.</p>':'<p class="msg ok">Te quedan '+ars(lim-v)+'.</p>';}
     return '<div class="tipo"><div class="h"><b>'+TN[k]+' · '+Math.round(PCT[k]*100)+'%</b><span>'+ars(v)+' de '+ars(lim)+'</span></div><div class="track"><div class="fill '+cls+'" style="width:'+Math.min(100,Math.round(p*100))+'%"></div></div>'+msg+'</div>'}).join("");
-  var cs=Object.keys(R.c).sort(function(a,b){return R.c[b]-R.c[a]});
-  $("m-cats").innerHTML=cs.length?cs.map(function(c){return '<div class="row"><span class="l"><b>'+c+'</b><small>'+TX[TIPO[c]||"D"]+'</small></span><span class="r">'+ars(R.c[c])+'</span></div>'}).join(""):'<p class="empty">Todavía no cargaste gastos este mes.</p>';
+  var B=renderPresu(pmes(),R),todas={};Object.keys(R.c).forEach(function(c){todas[c]=1});Object.keys(B).forEach(function(c){if(B[c]>0)todas[c]=1});
+  var cs=Object.keys(todas).sort(function(a,b){return (R.c[b]||0)-(R.c[a]||0)||(B[b]||0)-(B[a]||0)});
+  $("m-cats").innerHTML=cs.length?cs.map(function(c){var g=R.c[c]||0,b=B[c]||0;
+    if(!(b>0))return '<div class="row"><span class="l"><b>'+c+'</b><small>'+TX[TIPO[c]||"D"]+'</small></span><span class="r">'+ars(g)+'</span></div>';
+    var pc=g/b,cls=pc>1?"bad":pc>=.8?"warn":"";
+    return '<div class="cat-bar"><div class="h"><span><b>'+c+'</b> <small style="color:var(--muted)">'+TX[TIPO[c]||"D"]+'</small></span><span class="r">'+ars(g)+' de '+ars(b)+'</span></div><div class="track"><div class="fill '+cls+'" style="width:'+Math.min(100,Math.round(pc*100))+'%"></div></div><p class="msg '+(pc>1?"bad":pc>=.8?"warn":"ok")+'">'+(pc>1?"Te pasaste "+ars(g-b)+".":"Te quedan "+ars(b-g)+".")+'</p></div>'}).join(""):'<p class="empty">Todavía no cargaste gastos este mes.</p>';
   $("m-movs").innerHTML=L.length?L.map(function(g){var f=g.fecha.split("-");return '<div class="row" data-id="'+g.id+'"><span class="l"><b>'+(g.desc||g.cat)+'</b><small>'+f[2]+"/"+f[1]+' · '+g.cat+' · '+g.medio+'</small>'+(g.virtual?'':'<br><button type="button" class="del" data-del="'+g.id+'">Borrar</button>')+'</span><span class="r">'+(g.mon==="USD"?usd(g.monto)+'<br><small>'+ars(enPesos(g))+'</small>':ars(g.monto))+'</span></div>'}).join(""):'<p class="empty">Sin movimientos.</p>';
   $("m-movs").querySelectorAll("[data-del]").forEach(function(b){b.addEventListener("click",function(){
     if(b.dataset.ok){var g=S.gastos.filter(function(x){return x.id===b.dataset.del})[0];
@@ -611,7 +641,7 @@ function borrado(id){if(S.del.indexOf(id)<0)S.del.push(id);}
 
 // Sincronización entre dispositivos (solo Pro): se sube el estado y se mezcla por id (nada que se borró vuelve a aparecer).
 var pushT=null;
-function datosSync(){var d={ingreso:S.ingreso,dolar:S.dolar,gastos:S.gastos.filter(function(g){return g.origen!=="sheet"}),tour:!!S.tour,del:S.del};
+function datosSync(){var d={ingreso:S.ingreso,dolar:S.dolar,gastos:S.gastos.filter(function(g){return g.origen!=="sheet"}),tour:!!S.tour,presu:S.presu||{},del:S.del};
   if(esPro()){d.cuotas=S.cuotas;d.usd=S.usd;d.metas=S.metas;d.simu=S.simu;}return d;}
 function pushSoon(){if(!S.token)return;clearTimeout(pushT);pushT=setTimeout(function(){api("/api/app/datos",{method:"PUT",auth:true,body:{datos:datosSync()}}).catch(function(){});},1500);}
 function unir(a,b,ids){var m={};(b||[]).concat(a||[]).forEach(function(x){if(x&&x.id&&ids.indexOf(x.id)<0)m[x.id]=x;});return Object.keys(m).map(function(k){return m[k]});}
@@ -621,6 +651,7 @@ function pullDatos(){if(!S.token)return Promise.resolve();
     var sheet=S.gastos.filter(function(g){return g.origen==="sheet"});
     S.gastos=sheet.concat(unir(S.gastos.filter(function(g){return g.origen!=="sheet"}),d.gastos,del));
     if(d.tour)S.tour=true;
+    if(d.presu){S.presu=S.presu||{};Object.keys(d.presu).forEach(function(k){if(!S.presu[k])S.presu[k]=d.presu[k];});}
     if(esPro()){S.cuotas=unir(S.cuotas,d.cuotas,del);S.metas=unir(S.metas,d.metas,del);
     var ops=unir(S.usd.ops,(d.usd||{}).ops,del);S.usd=Object.assign({},d.usd||{},S.usd,{ops:ops});}
     if(!S.ingreso&&d.ingreso)S.ingreso=d.ingreso;if(!S.dolar&&d.dolar)S.dolar=d.dolar;if(esPro()&&!Object.keys(S.simu).length&&d.simu)S.simu=d.simu;
