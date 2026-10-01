@@ -104,7 +104,8 @@ nav.tabs button[aria-current="page"]{color:var(--dark);border-top-color:var(--ac
 .legal{font-size:13px;color:var(--muted);text-align:center;margin:10px 0 0}
 .note{background:#FFF4CC;border-radius:12px;padding:12px;font-size:14px;margin-top:12px}
 .empty{color:var(--muted);font-size:15px;text-align:center;padding:14px 0}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid2>div{min-width:0}
+input[type=date],input[type=month]{min-width:0;max-width:100%;display:block;min-height:50px;-webkit-appearance:none;appearance:none;text-align:left}select{min-height:50px}
 .login{padding:28px 20px}
 .login .logo{width:64px;height:64px;border-radius:16px;background:var(--dark);display:grid;place-items:center;margin-bottom:18px}
 </style>
@@ -154,10 +155,11 @@ nav.tabs button[aria-current="page"]{color:var(--dark);border-top-color:var(--ac
     <div id="g-cotbox" hidden><label for="g-cot">Cotización de este gasto ($ por US$)</label><input id="g-cot" inputmode="decimal"></div>
     <label>Categoría</label>
     <div class="chips" id="g-cats"></div>
+    <label for="g-fecha">Fecha del gasto</label><input id="g-fecha" type="date">
+    <p class="note" style="margin:6px 0 0">El gasto cuenta en el mes de esta fecha.</p>
     <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:500;padding:8px 0">Más datos (opcional)</summary>
       <label for="g-desc">Descripción</label><input id="g-desc" maxlength="80" placeholder="Ej: súper del sábado">
-      <div class="grid2"><div><label for="g-fecha">Fecha</label><input id="g-fecha" type="date"></div>
-      <div><label for="g-medio">Medio de pago</label><select id="g-medio"><option>Débito</option><option>Efectivo</option><option>Transferencia</option><option>Tarjeta de crédito</option><option>Billetera virtual</option></select></div></div>
+      <label for="g-medio">Medio de pago</label><select id="g-medio"><option>Débito</option><option>Efectivo</option><option>Transferencia</option><option>Tarjeta de crédito</option><option>Billetera virtual</option></select>
     </details>
     <div class="savebar"><p class="err" id="g-err" hidden></p>
     <button class="btn" type="submit">Guardar gasto</button></div>
@@ -392,6 +394,7 @@ document.querySelectorAll("#tabs button").forEach(function(b){b.addEventListener
 var CORE="https://cosmart-training-core.conglomeradocosmart.workers.dev";
 function api(path,opt){opt=opt||{};var h={"Content-Type":"application/json"};if(opt.auth&&S.token)h.Authorization="Bearer "+S.token;
   return fetch(CORE+path,{method:opt.method||"GET",headers:h,body:opt.body?JSON.stringify(opt.body):undefined}).then(function(r){return r.json().catch(function(){return {}}).then(function(j){return {ok:r.ok,status:r.status,data:j}})});}
+function pullRapido(){return Promise.race([pullDatos(),new Promise(function(r){setTimeout(r,4000)})]);}
 function entrar(){show(S.ingreso>0&&S.dolar>0?"cargar":"setup");}
 function guardarToken(t){S.token=t;try{if(t)localStorage.setItem("vama_token",t);else localStorage.removeItem("vama_token");}catch(e){}}
 function notaL(el,t){var n=$(el);n.hidden=false;n.textContent=t;}
@@ -403,7 +406,7 @@ $("f-login").addEventListener("submit",function(e){e.preventDefault();var v=$("l
     guardarToken(r.data.token);
     return api("/api/app/me",{auth:true}).then(function(m){
       if(!m.ok){guardarToken("");notaL("l-nota","Esta app es para quienes compraron Plata en Orden.");return;}
-      S.email=v;S.pro=m.data.pro||null;S.libro=!!m.data.libro;$("l-pass").value="";save();entrar();pullDatos();});
+      S.email=v;S.pro=m.data.pro||null;S.libro=!!m.data.libro;$("l-pass").value="";save();return pullRapido().then(entrar);});
   }).catch(function(){notaL("l-nota","No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.");}).then(function(){b.disabled=false;});});
 $("l-olvide").addEventListener("click",function(e){e.preventDefault();var v=$("l-email").value.trim().toLowerCase();
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){notaL("l-nota","Escribí tu email arriba y volvé a tocar “Olvidé mi contraseña”.");return;}
@@ -608,17 +611,19 @@ function borrado(id){if(S.del.indexOf(id)<0)S.del.push(id);}
 
 // Sincronización entre dispositivos (solo Pro): se sube el estado y se mezcla por id (nada que se borró vuelve a aparecer).
 var pushT=null;
-function datosSync(){return {ingreso:S.ingreso,dolar:S.dolar,gastos:S.gastos.filter(function(g){return g.origen!=="sheet"}),cuotas:S.cuotas,usd:S.usd,metas:S.metas,simu:S.simu,del:S.del};}
-function pushSoon(){if(!esPro()||!S.token)return;clearTimeout(pushT);pushT=setTimeout(function(){api("/api/app/datos",{method:"PUT",auth:true,body:{datos:datosSync()}}).catch(function(){});},1500);}
+function datosSync(){var d={ingreso:S.ingreso,dolar:S.dolar,gastos:S.gastos.filter(function(g){return g.origen!=="sheet"}),tour:!!S.tour,del:S.del};
+  if(esPro()){d.cuotas=S.cuotas;d.usd=S.usd;d.metas=S.metas;d.simu=S.simu;}return d;}
+function pushSoon(){if(!S.token)return;clearTimeout(pushT);pushT=setTimeout(function(){api("/api/app/datos",{method:"PUT",auth:true,body:{datos:datosSync()}}).catch(function(){});},1500);}
 function unir(a,b,ids){var m={};(b||[]).concat(a||[]).forEach(function(x){if(x&&x.id&&ids.indexOf(x.id)<0)m[x.id]=x;});return Object.keys(m).map(function(k){return m[k]});}
-function pullDatos(){if(!esPro()||!S.token)return Promise.resolve();
+function pullDatos(){if(!S.token)return Promise.resolve();
   return api("/api/app/datos",{auth:true}).then(function(r){var d=r.ok&&r.data.datos&&r.data.datos.datos;if(!d)return pushSoon();
     var del=(S.del||[]).concat(d.del||[]).filter(function(x,i,a){return a.indexOf(x)===i});S.del=del;
     var sheet=S.gastos.filter(function(g){return g.origen==="sheet"});
     S.gastos=sheet.concat(unir(S.gastos.filter(function(g){return g.origen!=="sheet"}),d.gastos,del));
-    S.cuotas=unir(S.cuotas,d.cuotas,del);S.metas=unir(S.metas,d.metas,del);
-    var ops=unir(S.usd.ops,(d.usd||{}).ops,del);S.usd=Object.assign({},d.usd||{},S.usd,{ops:ops});
-    if(!S.ingreso&&d.ingreso)S.ingreso=d.ingreso;if(!S.dolar&&d.dolar)S.dolar=d.dolar;if(!Object.keys(S.simu).length&&d.simu)S.simu=d.simu;
+    if(d.tour)S.tour=true;
+    if(esPro()){S.cuotas=unir(S.cuotas,d.cuotas,del);S.metas=unir(S.metas,d.metas,del);
+    var ops=unir(S.usd.ops,(d.usd||{}).ops,del);S.usd=Object.assign({},d.usd||{},S.usd,{ops:ops});}
+    if(!S.ingreso&&d.ingreso)S.ingreso=d.ingreso;if(!S.dolar&&d.dolar)S.dolar=d.dolar;if(esPro()&&!Object.keys(S.simu).length&&d.simu)S.simu=d.simu;
     save();}).catch(function(){});}
 
 // Estado de la cuenta (y precios) desde el servidor
@@ -758,7 +763,7 @@ function montarPaypalSub(){if(ppListo)return;
   if(!S.token){try{S.token=localStorage.getItem("vama_token")||"";}catch(e){}}
   if(S.token&&S.email){entrar();refrescarMe().then(function(){return pullDatos();}).then(function(){if(!$("v-mes").hidden)renderMes();});
     if(S.sheet&&GACTIVO)window.sincronizar().then(function(){if(!$("v-mes").hidden)renderMes();}).catch(function(){});return;}
-  if(S.token&&!S.email){api("/api/app/me",{auth:true}).then(function(m){if(m.ok){S.email=m.data.email;S.pro=m.data.pro||null;S.libro=!!m.data.libro;save();entrar();pullDatos();}else{guardarToken("");show("login");}}).catch(function(){show("login");});return;}
+  if(S.token&&!S.email){api("/api/app/me",{auth:true}).then(function(m){if(m.ok){S.email=m.data.email;S.pro=m.data.pro||null;S.libro=!!m.data.libro;save();pullRapido().then(entrar);}else{guardarToken("");show("login");}}).catch(function(){show("login");});return;}
   S.email="";show("login");
 })();
 })();
