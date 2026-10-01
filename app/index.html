@@ -241,7 +241,7 @@ input[type=date],input[type=month]{min-width:0;max-width:100%;display:block;min-
     <details><summary>Cambiar tu ingreso o el dólar</summary><p>En Recursos › Ajustes.</p></details>
     <details><summary>Usar tu planilla en Google Sheets</summary><p>Necesitás una cuenta de Gmail (la misma con la que entrás a Google Drive).</p><ol><li>Descargá la planilla (con ejemplos o en blanco) desde Mis recursos.</li><li>Entrá a drive.google.com con tu Gmail.</li><li>Tocá “+ Nuevo” → “Subir archivo” y elegí el Excel que descargaste.</li><li>Abrí el archivo ya subido y tocá Archivo → “Guardar como hoja de cálculo de Google”.</li><li>Listo: la editás desde el celu o la compu y se guarda sola.</li></ol><p><b>Importante:</b> si solo abrís el Excel en Drive sin guardarlo como hoja de cálculo de Google, algunas fórmulas pueden no funcionar.</p></details>
     <details><summary>Conectar tu planilla</summary><ol><li>Abrí tu copia de la planilla en Google Sheets. Si la tenés en Excel, subila a Drive y usá Archivo › Guardar como Hojas de cálculo de Google.</li><li>En “Mi mes”, tocá “Conectar mi planilla de Google Sheets”.</li><li>Elegí tu archivo. La app solo puede ver esa planilla, nada más de tu Drive.</li></ol></details>
-    <details><summary>Las cuotas de tarjeta</summary><p>Cargalas en la pestaña Cuotas de la planilla, o en “Mis cuotas” si tenés Pro. Así se suman solas cada mes y no se cuentan dos veces.</p></details>
+    <details><summary>Las cuotas de tarjeta</summary><p>Cargalas una sola vez en la pestaña Cuotas de la planilla, o en “Mis cuotas” si tenés Pro. Se suman solas cada mes. Cuando pagás una cuota no la cargás como gasto: la marcás como pagada.</p></details>
     <details><summary>¿Tus datos?</summary><p>Son tuyos. Quedan en tu celu y en tu planilla, y no los compartimos con nadie.</p></details>
   </div>
   <button class="btn sec" type="button" id="r-tour">Ver el recorrido de bienvenida</button>
@@ -259,7 +259,7 @@ input[type=date],input[type=month]{min-width:0;max-width:100%;display:block;min-
 <main id="v-pro" hidden>
   <div id="pro-venta">
   <div class="pro-hero"><p style="margin:0;font-size:12px;letter-spacing:.14em;font-weight:700;color:#7FE0A8">PLATA EN ORDEN PRO</p><h1 class="serif">Tu plata, un paso adelante</h1><p>Cuotas, dólares, metas y un simulador para decidir con tus números.</p></div>
-  <div class="feat"><span class="lock">PRO</span><b>Mis cuotas</b><p>Cargás tus compras en cuotas y ves cuánto de tus próximos sueldos ya está comprometido.</p></div>
+  <div class="feat"><span class="lock">PRO</span><b>Mis cuotas</b><p>Marcá cada cuota cuando la pagás y mirá cuánto te falta este mes. Y cuánto de tus próximos sueldos ya está comprometido.</p></div>
   <div class="feat"><span class="lock">PRO</span><b>Mis dólares</b><p>Cuántos tenés, dónde, a qué precio promedio y cuánto valen hoy, con la cotización del día.</p></div>
   <div class="feat"><span class="lock">PRO</span><b>Simulador</b><p>¿Dónde pongo mis pesos este mes? Compará plazo fijo, dólar y fondos con tus números. Contenido educativo, no es una recomendación de inversión.</p></div>
   <div class="feat"><span class="lock">PRO</span><b>Metas de ahorro</b><p>Poné un objetivo y seguí tu avance con una barra de progreso.</p></div>
@@ -277,7 +277,7 @@ input[type=date],input[type=month]{min-width:0;max-width:100%;display:block;min-
     <section id="p-cuotas" hidden>
       <h1 class="serif">Mis cuotas</h1>
       <p class="sub">Cargá tus compras en cuotas y mirá cuánto de tus próximos sueldos ya está comprometido.</p>
-      <div class="kpis"><div class="kpi"><small>Este mes pagás</small><b id="cu-mes"></b></div><div class="kpi"><small>Próximo mes</small><b id="cu-prox"></b></div></div>
+      <div class="kpis"><div class="kpi"><small>Este mes</small><b id="cu-mes"></b></div><div class="kpi"><small>Ya pagaste</small><b id="cu-pag"></b></div><div class="kpi"><small>Te falta</small><b id="cu-falta"></b></div><div class="kpi"><small>Próximo mes</small><b id="cu-prox"></b></div></div>
       <div class="tipo"><div class="h"><b>Comprometido de tu ingreso</b><span id="cu-pct"></span></div><div class="track"><div class="fill" id="cu-fill" style="width:0"></div></div><p class="msg" id="cu-msg"></p></div>
       <form id="f-cuota" class="card" style="margin-top:12px" novalidate>
         <label for="cu-nom">Compra</label><input id="cu-nom" maxlength="60" placeholder="Ej: heladera">
@@ -682,13 +682,15 @@ function cuotaEn(c,p){var i=mesesEntre(c.mes,p);return i>=0&&i<c.cant?c.valor:0;
 function totalCuotas(p){return S.cuotas.reduce(function(t,c){return t+cuotaEn(c,p)},0);}
 window.__cuotasMes=function(p){return esPro()?totalCuotas(p):0;};
 function renderCuotas(){var hoyM=ym(new Date().getFullYear(),new Date().getMonth()),prox=sumarMes(hoyM,1);
-  $("cu-mes").textContent=ars(totalCuotas(hoyM));$("cu-prox").textContent=ars(totalCuotas(prox));
+  var tMes=totalCuotas(hoyM),pagado=S.cuotas.reduce(function(t,c){return t+(c.pagada===hoyM?cuotaEn(c,hoyM):0)},0);
+  $("cu-mes").textContent=ars(tMes);$("cu-pag").textContent=ars(pagado);$("cu-falta").textContent=ars(Math.max(0,tMes-pagado));$("cu-prox").textContent=ars(totalCuotas(prox));
   var I=ingDe(hoyM),t=totalCuotas(hoyM),p=I>0?t/I:0;$("cu-pct").textContent=I>0?Math.round(p*100)+"%":"—";
   $("cu-fill").style.width=Math.min(100,Math.round(p*100))+"%";$("cu-fill").className="fill"+(p>.3?" bad":p>=.2?" warn":"");
   $("cu-msg").className="msg "+(p>.3?"bad":p>=.2?"warn":"ok");
   $("cu-msg").textContent=I<=0?"Cargá tu ingreso en Ajustes para ver qué parte ya está comprometida.":(p>.3?"Pasás del 30% de tus ingresos: la regla es simple, no sumes cuotas nuevas hasta bajarlo.":"Vas bien: estás por debajo del 30% de tus ingresos.");
   $("cu-lista").innerHTML=S.cuotas.length?S.cuotas.map(function(c){var rest=Math.max(0,c.cant-Math.max(0,mesesEntre(c.mes,hoyM)));
-    return '<div class="row"><span class="l"><b>'+esc(c.nombre)+'</b><small>'+esc(c.tarjeta||"Tarjeta")+' · desde '+nombreMes(c.mes)+' · '+c.cant+' cuotas · quedan '+rest+'</small><br><button type="button" class="del" data-cdel="'+c.id+'">Borrar</button></span><span class="r">'+ars(c.valor)+'</span></div>'}).join(""):'<p class="empty">Todavía no cargaste compras en cuotas.</p>';
+    return '<div class="row"><span class="l"><b>'+esc(c.nombre)+'</b><small>'+esc(c.tarjeta||"Tarjeta")+' · desde '+nombreMes(c.mes)+' · '+c.cant+' cuotas · quedan '+rest+'</small><br>'+(cuotaEn(c,hoyM)>0?'<button type="button" class="chip" data-cpag="'+c.id+'" aria-pressed="'+(c.pagada===hoyM)+'" style="min-height:44px">Pagada: '+(c.pagada===hoyM?"Sí":"No")+'</button> ':'')+'<button type="button" class="del" data-cdel="'+c.id+'">Borrar</button></span><span class="r">'+ars(c.valor)+'</span></div>'}).join(""):'<p class="empty">Todavía no cargaste compras en cuotas.</p>';
+  $("cu-lista").querySelectorAll("[data-cpag]").forEach(function(b){b.addEventListener("click",function(){var c=S.cuotas.filter(function(x){return x.id===b.dataset.cpag})[0];if(!c)return;c.pagada=c.pagada===hoyM?"":hoyM;save();renderCuotas();});});
   $("cu-lista").querySelectorAll("[data-cdel]").forEach(function(b){b.addEventListener("click",function(){if(b.dataset.ok){borrado(b.dataset.cdel);S.cuotas=S.cuotas.filter(function(c){return c.id!==b.dataset.cdel});save();renderCuotas();}else{b.dataset.ok="1";b.textContent="Tocá de nuevo para confirmar";}});});
   var f="";for(var i=0;i<12;i++){var q=sumarMes(hoyM,i),v=totalCuotas(q),ing=ingDe(q),pp=ing>0?Math.round(v/ing*100):0;f+='<div class="row"><span class="l"><b>'+nombreMes(q)+'</b></span><span class="r">'+ars(v)+(ing>0?' <small>'+pp+'%</small>':'')+'</span></div>';}
   $("cu-12").innerHTML=f;}
