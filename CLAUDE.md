@@ -16,3 +16,4 @@ Leé **`HANDOFF.md`** (raíz de este repo) ANTES de tocar código. El backend vi
 - Todo se optimiza para **mobile primero**; probá sin scroll horizontal y con todos los botones funcionando.
 - Las páginas nuevas se muestran primero en preview (artifact) para que Vaneh las corrija.
 - Sin build: HTML/CSS/JS plano. Validá el JS inline con `node --check` antes de commitear.
+- **Marcas propias (regla de Vaneh, 17/10/2026):** toda app, ebook o recurso nuevo que NO sea de COSMART ni de VAMA y tenga branding propio debe tener su propio AI Operating System, armado con la misma estructura del de COSMART pero con contenido propio. Antes de escribir o diseñar cualquier cosa para esa marca, leé su Operating System. Los documentos viven en repos PRIVADOS: **este repo es público, nunca copiar acá un Operating System** (es contenido sensible); pedírselo a Vaneh o leerlo desde el repo privado. Nunca se mezcla con el de COSMART ni con el de otra marca.
