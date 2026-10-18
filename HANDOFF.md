@@ -2,6 +2,14 @@
 
 Actualizado: 2026-09-29.
 
+## [18/10] Pendientes MANUALES de Vaneh para dominio y mail de VAMA (Verano en Juego) -- anotados al cierre del día
+Los hace Vaneh (no se pueden hacer desde el código). Hacen falta antes de que Verano en Juego mande su primer mail real:
+1. **Agregar el subdominio** `apps.vamatienda.com.ar` (todavía no está dado de alta) y apuntarlo a donde se publica `juegos/` (rutas absolutas `/juegos/...`).
+2. **Abrir la cuenta de Brevo de VAMA** (`vamatienda.com.ar`): todavía no existe. Cargar ahí el dominio y hacer la **verificación del dominio** (registros DNS que pide Brevo: SPF/DKIM/DMARC).
+3. **Crear el mail `hola@vamatienda.com.ar` en Zoho** (plan gratis) para tener la casilla abierta. Es el remitente de los mails de activación (`MAIL_FROM_EMAIL`) y el contacto de soporte; tiene que estar verificado en Brevo.
+4. Con la cuenta de Brevo de VAMA: generar su API key y cargarla como secret `BREVO_API_KEY` del Worker `verano-en-juego` (hoy los otros Workers usan la cuenta de COSMART; este mail sale desde el dominio de VAMA).
+Detalle técnico y resto de pasos (D1, claves de firma, secrets, deploy, webhook de MP): `workers/verano-en-juego/README.md` en `AquiVane/cosmart-workers`.
+
 ## Verano en Juego (`juegos/`) — 18/10/2026, rama `claude/great-einstein-odu0bs`, SIN PUBLICAR
 App de 17 juegos offline (pago único ARS 3.500 / USD 2,28), pedida por Vaneh. Carpeta `juegos/` (ver `juegos/README.md`): landing, categoría, checkout (Brick MP + PayPal), "Ya la compré", gracias y la app en `juegos/jugar/index.html` (un solo archivo, **generado** por `npm run build` desde `juegos/src/jugar/`; el que se commitea es SIEMPRE el de producción, sin "Modo revisión").
 - Backend en `cosmart-workers` (`workers/verano-en-juego` + producto en `mp-productos-ganadores`). Licencia firmada Ed25519, un dispositivo, latido, recuperar con cooldown 180 d.
