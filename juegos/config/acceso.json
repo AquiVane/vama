@@ -1,0 +1,4 @@
+{
+  "_ayuda": "Qué se juega sin licencia. Por decisión de Vaneh (zip) la app es 100% paga: nada se juega sin licencia. Para habilitar una prueba más adelante, listá ids en juegos_libres. La app todavía no lee este archivo: se conecta en una próxima etapa si se decide ofrecer prueba.",
+  "sin_licencia": { "juegos_libres": [], "niveles_libres_por_juego": 0 }
+}

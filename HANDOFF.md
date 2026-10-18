@@ -2,6 +2,13 @@
 
 Actualizado: 2026-09-29.
 
+## Verano en Juego (`juegos/`) — 18/10/2026, rama `claude/great-einstein-odu0bs`, SIN PUBLICAR
+App de 17 juegos offline (pago único ARS 3.500 / USD 2,28), pedida por Vaneh. Carpeta `juegos/` (ver `juegos/README.md`): landing, categoría, checkout (Brick MP + PayPal), "Ya la compré", gracias y la app en `juegos/jugar/index.html` (un solo archivo, **generado** por `npm run build` desde `juegos/src/jugar/`; el que se commitea es SIEMPRE el de producción, sin "Modo revisión").
+- Backend en `cosmart-workers` (`workers/verano-en-juego` + producto en `mp-productos-ganadores`). Licencia firmada Ed25519, un dispositivo, latido, recuperar con cooldown 180 d.
+- **Excepción a "sin build"**: solo `juegos/` usa Node para generar `jugar/index.html` y la marca blanca (`npm run build:marca -- --cliente=x`). El resto del repo sigue sin build.
+- Falta (manual): clave pública de firma en `juegos/config/firma-publica.txt` + `npm run build`; deploy del backend; decidir dónde se sirve (`apps.vamatienda.com.ar/juegos/`, rutas absolutas `/juegos/...`).
+- Tests: `cd juegos && npm test` y `npm run test:e2e` (47 pruebas, Chromium 390 px contra el Worker real con D1 simulada).
+
 ## Qué es
 Frontend estático de `academy.vamatienda.com.ar` (GitHub Pages, `main`, raíz, CNAME en este repo). Primer producto: **Plata en Orden** ($14.900 ARS / USD 10.90) con bump **Plan de 90 días para tu fondo de emergencia** ($6.900 / USD 4.90). Backend = `cosmart-workers` (`cosmart-training-core` + `mp-productos-ganadores`). Training (`training.cosmart.com.ar`) no se toca.
 

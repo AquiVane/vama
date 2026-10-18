@@ -1,0 +1,28 @@
+{
+  "_ayuda": "Marca blanca. 'verano' es la marca por defecto; cada cliente solo pisa lo que cambia. Generar con: npm run build:marca -- --cliente=nombre. logo = ruta a un PNG cuadrado de 512 px (relativa a esta carpeta config/). juegos = 'todos' o lista de ids: impostor, tutti-frutti, mimica, quien-es-mas-probable, desafios, memotest, laberinto, sudoku, sopa-de-letras, ahorcado, hanoi, anagramas, puzzle, nonogramas, buscaminas, numero-secreto, simon.",
+  "verano": {
+    "nombre": "Verano en Juego",
+    "nombreCorto": "Verano en Juego",
+    "colores": { "azul": "#0B5FA5", "amarillo": "#FFC93C", "coral": "#D93A32", "verde": "#0C7F6D" },
+    "themeColor": "#0B5FA5",
+    "logo": null,
+    "portada": { "titulo": "Verano en Juego", "subtitulo": "17 juegos para la mesa, la playa y el viaje." },
+    "juegos": "todos",
+    "contacto": { "texto": "Ayuda", "url": "https://vamatienda.com.ar" },
+    "landingUrl": "/juegos/verano-en-juego/",
+    "recuperarUrl": "/juegos/verano-en-juego/ya-la-compre/"
+  },
+  "clientes": {
+    "ejemplo": {
+      "nombre": "Club de Juegos Sol",
+      "nombreCorto": "Club Sol",
+      "colores": { "azul": "#1F4E79", "amarillo": "#F2B705", "coral": "#C0392B", "verde": "#1E8449" },
+      "themeColor": "#1F4E79",
+      "portada": { "titulo": "Club de Juegos Sol", "subtitulo": "Los juegos favoritos de nuestros socios." },
+      "juegos": ["impostor", "tutti-frutti", "mimica", "sudoku", "memotest", "simon"],
+      "contacto": { "texto": "Escribinos", "url": "https://example.com/contacto" },
+      "landingUrl": "https://example.com/club-sol",
+      "recuperarUrl": "https://example.com/club-sol/recuperar"
+    }
+  }
+}

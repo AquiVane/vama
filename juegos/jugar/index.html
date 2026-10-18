@@ -1,0 +1,1350 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Verano en Juego</title>
+<meta name="theme-color" content="#0B5FA5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Verano en Juego">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="/juegos/manifest.webmanifest">
+<link rel="icon" href="/juegos/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/juegos/icons/apple-touch-icon.png">
+<style>
+@font-face{font-family:'Bricolage Grotesque';font-weight:800;font-style:normal;font-display:swap;src:url(/juegos/fonts/bricolage.woff2) format('woff2')}
+@font-face{font-family:'Figtree';font-weight:400 700;font-style:normal;font-display:swap;src:url(/juegos/fonts/figtree.woff2) format('woff2')}
+:root{--azul:#0B5FA5;--sol:#FFC93C;--coral:#D93A32;--verde:#0C7F6D;--bg:#F4FAFC;--fg:#0E2233;--card:#FFFFFF;--line:#CFE2EC;--muted:#3F566A;--ink:#0E2233;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0A1A2B;--fg:#F2F8FB;--card:#102A42;--line:#244A68;--muted:#C9DCE8;color-scheme:dark}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--fg);font-family:'Figtree',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:18px;line-height:1.4;-webkit-text-size-adjust:100%;overflow-x:hidden;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+h1,h2,h3,p{margin:0}
+h1,h2,h3,.disp{font-family:'Bricolage Grotesque','Figtree',system-ui,sans-serif;font-weight:800}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--sol);outline-offset:3px}
+a{color:inherit}
+[hidden]{display:none!important}
+.pag{min-height:100%;display:flex;flex-direction:column;padding:max(14px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.cen{width:100%;max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:18px;flex:1}
+.franja{display:flex;height:12px;border-radius:6px;overflow:hidden;flex:none}.franja i{flex:1}
+.franja i:nth-child(1){background:#FFC93C}.franja i:nth-child(2){background:#D93A32}.franja i:nth-child(3){background:#0C7F6D}.franja i:nth-child(4){background:#0B5FA5}
+/* fondos oscuros → texto blanco */
+.oscuro{background:var(--azul);color:#fff}.oscuro *{color:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 22px;border-radius:16px;border:0;font-weight:700;font-size:18px;text-decoration:none;text-align:center;background:var(--azul);color:#fff}
+.btn.sol{background:var(--sol);color:var(--ink)}.btn.coral{background:var(--coral);color:#fff}.btn.verde{background:var(--verde);color:#fff}
+.btn.linea{background:transparent;border:3px solid currentColor}
+.btn.grande{min-height:60px;font-size:20px;border-radius:18px;font-family:'Bricolage Grotesque','Figtree',sans-serif;font-weight:800}
+.btn.chico{min-height:48px;padding:0 16px;font-size:16px}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.fila{display:flex;flex-wrap:wrap;gap:12px}.fila>*{flex:1 1 140px}
+.tarjeta{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.msg{border-radius:16px;padding:14px 16px;font-weight:600;line-height:1.4}
+.msg.mal{background:var(--coral);color:#fff}.msg.ok{background:var(--verde);color:#fff}.msg.info{background:var(--azul);color:#fff}
+input[type=text],input[type=number],input[type=email]{width:100%;min-height:56px;padding:0 16px;border:2px solid var(--line);border-radius:14px;background:var(--card);color:var(--fg);font:600 20px 'Figtree',system-ui,sans-serif;-webkit-user-select:text;user-select:text}
+input.codigo{text-transform:uppercase;letter-spacing:2px;text-align:center;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:24px}
+input::placeholder{color:var(--muted);opacity:.75}
+label{font-weight:700}
+/* barra de juego */
+.barra{display:flex;align-items:center;gap:10px;flex:none}
+.barra h2{font-size:clamp(22px,6vw,30px);line-height:1.05;flex:1;min-width:0}
+.barra .btn{flex:none}
+/* inicio */
+.marca{display:flex;align-items:center;gap:12px}
+.marca svg,.marca img{width:48px;height:48px;border-radius:14px;flex:none}
+.marca b{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:clamp(22px,6vw,28px)}
+.hero h1{font-size:clamp(34px,9vw,52px);line-height:1}
+.grid-j{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:14px}
+.j{border:0;border-radius:22px;padding:18px;min-height:132px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;gap:10px;box-shadow:0 6px 0 rgba(14,34,51,.18)}
+.j small{font-size:15px;font-weight:700;letter-spacing:.08em}
+.j h3{font-size:24px;line-height:1.05}.j p{font-size:16px;line-height:1.3}
+.j.azul{background:var(--azul);color:#fff}.j.sol{background:var(--sol);color:var(--ink)}.j.coral{background:var(--coral);color:#fff}.j.verde{background:var(--verde);color:#fff}
+.j.azul *,.j.coral *,.j.verde *{color:#fff}.j.sol *{color:var(--ink)}
+.j .prog{font-size:15px;font-weight:700}
+/* niveles */
+.pestanas{display:flex;gap:8px;flex-wrap:wrap}
+.pestanas button{min-height:48px;padding:0 16px;border-radius:14px;border:2px solid var(--line);background:transparent;font-weight:700}
+.pestanas button[aria-pressed=true]{background:var(--azul);border-color:var(--azul);color:#fff}
+.niveles{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:10px}
+.niv{min-height:56px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-weight:800;font-size:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.niv.hecho{background:var(--verde);border-color:var(--verde);color:#fff}
+.niv.actual{background:var(--sol);border-color:var(--sol);color:var(--ink)}
+.niv[disabled]{opacity:.45}
+.niv small{font-size:11px;font-weight:700}
+/* tablero genérico */
+.area{flex:1;display:flex;flex-direction:column;align-items:center;gap:14px;min-height:0}
+.estado{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-weight:700}
+.estado span{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:6px 14px;min-height:40px;display:inline-flex;align-items:center}
+.gran{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;line-height:1}
+.centro{text-align:center}
+.superpuesto{position:fixed;inset:0;background:rgba(10,26,43,.88);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50}
+.superpuesto .caja{background:var(--azul);color:#fff;border-radius:28px;padding:26px;max-width:460px;width:100%;display:flex;flex-direction:column;gap:16px;text-align:center}
+.superpuesto .caja *{color:#fff}.superpuesto .caja .sol{color:var(--ink)}
+.superpuesto h2{font-size:34px;line-height:1}
+.estrellas{display:flex;gap:6px;justify-content:center}
+.estrellas svg{width:40px;height:40px}
+.chip{display:inline-flex;align-items:center;min-height:48px;padding:0 16px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-weight:700}
+.sel{display:flex;flex-wrap:wrap;gap:8px}
+.sel button{min-height:48px;padding:0 16px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-weight:700}
+.sel button[aria-pressed=true]{background:var(--azul);border-color:var(--azul);color:#fff}
+.cuenta{font-size:clamp(80px,30vw,180px)}
+.tablero{display:grid;gap:6px;width:100%;max-width:min(100%,520px)}
+canvas{max-width:100%;touch-action:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+</style>
+</head>
+<body>
+<div id="app" aria-live="polite"></div>
+<noscript><p style="padding:24px;color:#fff;background:#0B5FA5;font:700 20px system-ui">Para jugar necesitás activar JavaScript en tu navegador.</p></noscript>
+<script>
+/* Laberinto: 200 niveles con semilla. Construido con "backtracker" iterativo → siempre tiene solución única entre entrada y salida. */
+(function (g) {
+  var L = g.VEJL = g.VEJL || {};
+  var N = 1, E = 2, S = 4, O = 8, DX = { 1: 0, 2: 1, 4: 0, 8: -1 }, DY = { 1: -1, 2: 0, 4: 1, 8: 0 }, OPUESTO = { 1: 4, 2: 8, 4: 1, 8: 2 };
+  L.laberintoTam = function (nivel) { return 5 + Math.floor((nivel - 1) / 12); };   // 5x5 … 21x21
+  L.laberinto = function (nivel) {
+    var n = L.laberintoTam(nivel), r = L.rng(nivel * 104729 + 7), celdas = new Array(n * n).fill(0), vis = new Array(n * n).fill(false), pila = [0];
+    vis[0] = true;
+    while (pila.length) {
+      var cur = pila[pila.length - 1], x = cur % n, y = (cur / n) | 0, vec = [];
+      [N, E, S, O].forEach(function (d) { var nx = x + DX[d], ny = y + DY[d]; if (nx >= 0 && ny >= 0 && nx < n && ny < n && !vis[ny * n + nx]) vec.push(d); });
+      if (!vec.length) { pila.pop(); continue; }
+      var d = vec[Math.floor(r() * vec.length)], nx2 = x + DX[d], ny2 = y + DY[d], ni = ny2 * n + nx2;
+      celdas[cur] |= d; celdas[ni] |= OPUESTO[d]; vis[ni] = true; pila.push(ni);
+    }
+    return { n: n, celdas: celdas, inicio: 0, fin: n * n - 1 };
+  };
+  L.laberintoDirs = { N: N, E: E, S: S, O: O, DX: DX, DY: DY };
+  // Camino más corto (cantidad de pasos) — para las estrellas y para los tests
+  L.laberintoCamino = function (m) {
+    var n = m.n, dist = new Array(n * n).fill(-1), cola = [m.inicio]; dist[m.inicio] = 0;
+    while (cola.length) {
+      var c = cola.shift(); if (c === m.fin) return dist[c];
+      [N, E, S, O].forEach(function (d) { if (m.celdas[c] & d) { var nx = (c % n) + DX[d], ny = ((c / n) | 0) + DY[d], ni = ny * n + nx; if (dist[ni] < 0) { dist[ni] = dist[c] + 1; cola.push(ni); } } });
+    }
+    return -1;
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Nonogramas: 60 niveles (5x5 → 12x12). La imagen sale de una semilla con simetría (parece una figura); se acepta cualquier tablero que cumpla las pistas. */
+(function (g) {
+  var L = g.VEJL = g.VEJL || {};
+  L.NONO_NIVELES = 60;
+  L.nonoTam = function (nivel) { return 5 + Math.floor((nivel - 1) / 9); };  // 5…11
+  function pistas(linea) { var o = [], c = 0; for (var i = 0; i < linea.length; i++) { if (linea[i]) c++; else if (c) { o.push(c); c = 0; } } if (c) o.push(c); return o.length ? o : [0]; }
+  L.nonoPistas = pistas;
+  L.nonograma = function (nivel) {
+    var n = L.nonoTam(nivel), r = L.rng(nivel * 2654435761 % 4294967296 + 11), densidad = 0.5 + (nivel % 3) * 0.05, img;
+    for (var intento = 0; intento < 100; intento++) {
+      img = []; for (var y = 0; y < n; y++) { img.push([]); }
+      for (y = 0; y < n; y++) for (var x = 0; x < Math.ceil(n / 2); x++) { var v = r() < densidad ? 1 : 0; img[y][x] = v; img[y][n - 1 - x] = v; }
+      var filasOk = img.every(function (f) { return f.some(Boolean); }), colsOk = true;
+      for (x = 0; x < n; x++) if (!img.some(function (f) { return f[x]; })) colsOk = false;
+      if (filasOk && colsOk) break;
+    }
+    var filas = img.map(pistas), cols = []; for (var c = 0; c < n; c++) cols.push(pistas(img.map(function (f) { return f[c]; })));
+    return { n: n, img: img, filas: filas, cols: cols };
+  };
+  // ¿el tablero del jugador (matriz 0/1) cumple todas las pistas?
+  L.nonoCumple = function (nono, tab) {
+    var n = nono.n, eq = function (a, b) { return a.length === b.length && a.every(function (v, i) { return v === b[i]; }); };
+    for (var y = 0; y < n; y++) if (!eq(pistas(tab[y]), nono.filas[y])) return false;
+    for (var x = 0; x < n; x++) if (!eq(pistas(tab.map(function (f) { return f[x]; })), nono.cols[x])) return false;
+    return true;
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Generador pseudoaleatorio con semilla (mulberry32) compartido por los generadores de niveles. */
+(function (g) {
+  var L = g.VEJL = g.VEJL || {};
+  L.rng = function (seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
+  L.mezclar = function (arr, r) { var a = arr.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Sopa de letras: 200 niveles con semilla. Las palabras se colocan con su posición exacta, así el juego (y los tests) saben dónde están. */
+(function (g) {
+  var L = g.VEJL = g.VEJL || {};
+  L.PALABRAS = ('PLAYA SOL MAR ARENA OLA PILETA HELADO SOMBRILLA REPOSERA OJOTAS CARPA MATE FOGON ASADO CHOCLO VERANO SIESTA BALDE CAMINO VIAJE MOCHILA RUTA AUTO MICRO TREN AVION HOTEL CABANA CAMPING LAGO RIO SIERRA MONTANA BOSQUE NUBE VIENTO TORMENTA ESTRELLA LUNA FOTO MAPA BRUJULA FRUTA SANDIA DURAZNO CEREZA BANANA MELON LIMON NARANJA COCO FRUTILLA GELATINA JUGO LIMONADA HELADERA VENTILADOR TOALLA BIKINI REMERA GORRA ANTEOJOS CREMA PROTECTOR CANGREJO CARACOL PEZ DELFIN GAVIOTA TORTUGA MEDUSA PULPO BARCO REMO VELA ANCLA FAROL MUELLE ISLA COSTA DUNA BAHIA PUERTO CORAL ALGA PERLA CONCHA SURF BUCEO NADAR SALTAR CORRER JUGAR BAILAR CANTAR REIR AMIGOS FAMILIA FIESTA PICNIC PARRILLA CARBON BRASAS CHORIZO ENSALADA TOMATE PEPINO CEBOLLA PAPA MORRON ZAPALLO MANZANA PERA UVA KIWI ANANA PAPAYA MANGO ARBOL HAMACA TERRAZA PATIO JARDIN FLOR ABEJA MARIPOSA GRILLO LUCIERNAGA AMANECER ATARDECER VERDE AZUL ROJO AMARILLO NARANJA').split(' ')
+    .filter(function (w, i, a) { return a.indexOf(w) === i; });
+  var DIRS_FACIL = [[0, 1], [1, 0]], DIRS_MEDIO = [[0, 1], [1, 0], [1, 1]], DIRS_TODAS = [[0, 1], [1, 0], [1, 1], [-1, 1], [0, -1], [-1, 0], [-1, -1], [1, -1]];
+  L.sopaConfig = function (nivel) {
+    var tam = Math.min(12, 6 + Math.floor((nivel - 1) / 35)), cant = Math.min(10, 4 + Math.floor((nivel - 1) / 28));
+    var dirs = nivel <= 40 ? DIRS_FACIL : nivel <= 100 ? DIRS_MEDIO : DIRS_TODAS, maxLen = Math.min(tam, 5 + Math.floor((nivel - 1) / 40));
+    return { tam: tam, cant: cant, dirs: dirs, maxLen: maxLen };
+  };
+  L.sopa = function (nivel) {
+    var cfg = L.sopaConfig(nivel), r = L.rng(nivel * 15485863 + 3), n = cfg.tam;
+    for (var intento = 0; intento < 60; intento++) {
+      var grid = new Array(n * n).fill(''), colocadas = [], cand = L.mezclar(L.PALABRAS.filter(function (w) { return w.length <= cfg.maxLen && w.length >= 3; }), r);
+      for (var k = 0; k < cand.length && colocadas.length < cfg.cant; k++) {
+        var w = cand[k], ok = false;
+        for (var t = 0; t < 40 && !ok; t++) {
+          var d = cfg.dirs[Math.floor(r() * cfg.dirs.length)], row = Math.floor(r() * n), col = Math.floor(r() * n), er = row + d[0] * (w.length - 1), ec = col + d[1] * (w.length - 1);
+          if (er < 0 || ec < 0 || er >= n || ec >= n) continue;
+          var libre = true; for (var i = 0; i < w.length; i++) { var c = grid[(row + d[0] * i) * n + col + d[1] * i]; if (c && c !== w[i]) { libre = false; break; } }
+          if (!libre) continue;
+          for (var j = 0; j < w.length; j++) grid[(row + d[0] * j) * n + col + d[1] * j] = w[j];
+          colocadas.push({ w: w, r: row, c: col, dr: d[0], dc: d[1] }); ok = true;
+        }
+      }
+      if (colocadas.length >= Math.min(cfg.cant, 4)) {
+        var ABC = 'ABCDEFGHIJLMNOPRSTUV'; for (var q = 0; q < grid.length; q++) if (!grid[q]) grid[q] = ABC[Math.floor(r() * ABC.length)];
+        return { n: n, grid: grid, palabras: colocadas };
+      }
+    }
+    throw new Error('No se pudo generar la sopa ' + nivel);
+  };
+  // ¿la selección (celda inicio → celda fin) es una palabra de la lista? Acepta también al revés.
+  L.sopaCheck = function (s, a, b) {
+    var n = s.n, ar = (a / n) | 0, ac = a % n, br = (b / n) | 0, bc = b % n;
+    for (var i = 0; i < s.palabras.length; i++) {
+      var p = s.palabras[i], fr = p.r + p.dr * (p.w.length - 1), fc = p.c + p.dc * (p.w.length - 1);
+      if ((ar === p.r && ac === p.c && br === fr && bc === fc) || (br === p.r && bc === p.c && ar === fr && ac === fc)) return p;
+    }
+    return null;
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Sudoku: 200 niveles con solución ÚNICA garantizada (se verifica con un resolvedor al quitar cada pista). */
+(function (g) {
+  var L = g.VEJL = g.VEJL || {};
+  var BITS = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256];
+  function posibles(grid, i) { // máscara de dígitos posibles en la celda i
+    var r = (i / 9) | 0, c = i % 9, m = 0, k;
+    for (k = 0; k < 9; k++) { m |= BITS[grid[r * 9 + k]] | BITS[grid[k * 9 + c]]; }
+    var br = r - r % 3, bc = c - c % 3;
+    for (var a = 0; a < 3; a++) for (var b = 0; b < 3; b++) m |= BITS[grid[(br + a) * 9 + bc + b]];
+    return 511 & ~m;
+  }
+  function bitsA(m) { var o = []; for (var d = 1; d <= 9; d++) if (m & (1 << (d - 1))) o.push(d); return o; }
+  // Cuenta soluciones (hasta `limite`) y devuelve la primera encontrada en sol[]
+  function resolver(grid, limite, sol) {
+    var n = 0;
+    (function bt() {
+      if (n >= limite) return;
+      var mejor = -1, mm = 0, mc = 10;
+      for (var i = 0; i < 81; i++) if (!grid[i]) { var m = posibles(grid, i), c = bitsA(m).length; if (c < mc) { mc = c; mejor = i; mm = m; if (c <= 1) break; } }
+      if (mejor < 0) { n++; if (sol && n === 1) for (var k = 0; k < 81; k++) sol[k] = grid[k]; return; }
+      if (mc === 0) return;
+      var ds = bitsA(mm);
+      for (var j = 0; j < ds.length && n < limite; j++) { grid[mejor] = ds[j]; bt(); }
+      grid[mejor] = 0;
+    })();
+    return n;
+  }
+  function solucionBase(r) {
+    var nums = L.mezclar([1, 2, 3, 4, 5, 6, 7, 8, 9], r), filas = [], cols = [], i;
+    var bandas = L.mezclar([0, 1, 2], r), pilas = L.mezclar([0, 1, 2], r);
+    bandas.forEach(function (b) { L.mezclar([0, 1, 2], r).forEach(function (f) { filas.push(b * 3 + f); }); });
+    pilas.forEach(function (s) { L.mezclar([0, 1, 2], r).forEach(function (c) { cols.push(s * 3 + c); }); });
+    var out = new Array(81);
+    for (var rr = 0; rr < 9; rr++) for (var cc = 0; cc < 9; cc++) out[rr * 9 + cc] = nums[(3 * (filas[rr] % 3) + ((filas[rr] / 3) | 0) + cols[cc]) % 9];
+    return out;
+  }
+  // nivel 1..200 → 5 tiers de 40: pistas objetivo 46 → 24
+  L.sudokuPistas = function (nivel) { var tier = Math.min(4, ((nivel - 1) / 40) | 0), dentro = (nivel - 1) % 40; return [46, 40, 34, 30, 26][tier] - Math.round(dentro / 40 * 4); };
+  L.sudoku = function (nivel) {
+    var r = L.rng(nivel * 7919 + 13), sol = solucionBase(r), puz = sol.slice(), objetivo = L.sudokuPistas(nivel), pistas = 81;
+    var orden = L.mezclar(Array.apply(null, Array(81)).map(function (_, i) { return i; }), r);
+    for (var k = 0; k < orden.length && pistas > objetivo; k++) {
+      var i = orden[k], v = puz[i]; puz[i] = 0;
+      if (resolver(puz.slice(), 2) !== 1) puz[i] = v; else pistas--;
+    }
+    return { puzzle: puz, solucion: sol, pistas: pistas };
+  };
+  L.sudokuResolver = resolver;
+  L.sudokuPosibles = function (grid, i) { return bitsA(posibles(grid, i)); };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Verano en Juego — núcleo de la app: vistas, licencia (verificación offline), progreso y registro de juegos.
+   JS vanilla. Este archivo se inlinea en juegos/jugar/index.html por scripts/build.mjs. */
+(function () {
+  'use strict';
+  var MARCA = {"nombre":"Verano en Juego","nombreCorto":"Verano en Juego","colores":{"azul":"#0B5FA5","amarillo":"#FFC93C","coral":"#D93A32","verde":"#0C7F6D"},"themeColor":"#0B5FA5","logo":null,"portada":{"titulo":"Verano en Juego","subtitulo":"17 juegos para la mesa, la playa y el viaje."},"juegos":"todos","contacto":{"texto":"Ayuda","url":"https://vamatienda.com.ar"},"landingUrl":"/juegos/verano-en-juego/","recuperarUrl":"/juegos/verano-en-juego/ya-la-compre/"};
+  var CFG = { API: 'https://verano-en-juego.conglomeradocosmart.workers.dev', PUB: "", PRODUCTO: 'verano-en-juego' };
+  var VEJ = window.VEJ = { marca: MARCA, cfg: CFG, juegos: [], util: {}, lib: window.VEJL || {} };
+
+  /* ── utilidades ── */
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    for (var k in (attrs || {})) {
+      var v = attrs[k]; if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k.slice(0, 2) === 'on' && typeof v === 'function') el.addEventListener(k.slice(2), v);
+      else if (k === 'html') el.innerHTML = v;
+      else el.setAttribute(k, v === true ? '' : v);
+    }
+    for (var i = 2; i < arguments.length; i++) add(el, arguments[i]);
+    return el;
+  }
+  function add(el, c) {
+    if (c == null || c === false) return;
+    if (Array.isArray(c)) c.forEach(function (x) { add(el, x); });
+    else el.appendChild(c.nodeType ? c : document.createTextNode(String(c)));
+  }
+  function svg(html, cls) { var s = h('span', { class: cls || '', html: html, 'aria-hidden': 'true' }); return s; }
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) { } }
+  function jget(k, def) { try { var v = JSON.parse(lsGet(k)); return v == null ? def : v; } catch (e) { return def; } }
+  // Generador pseudoaleatorio con semilla (mulberry32): mismos niveles siempre
+  function rng(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function mezclar(arr, r) { r = r || Math.random; var a = arr.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function azar(arr, r) { return arr[Math.floor((r || Math.random)() * arr.length)]; }
+  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+  function tiempo(s) { return Math.floor(s / 60) + ':' + pad2(s % 60); }
+  VEJ.util = { h: h, rng: rng, mezclar: mezclar, azar: azar, tiempo: tiempo, svg: svg, lsGet: lsGet, lsSet: lsSet, jget: jget };
+
+  /* ── tema de marca ── */
+  (function tema() {
+    var c = MARCA.colores || {}, s = document.documentElement.style;
+    if (c.azul) s.setProperty('--azul', c.azul); if (c.amarillo) s.setProperty('--sol', c.amarillo);
+    if (c.coral) s.setProperty('--coral', c.coral); if (c.verde) s.setProperty('--verde', c.verde);
+  })();
+
+  /* ── métricas anónimas (sin datos personales; no bloquean nada si falla) ── */
+  function anon() {
+    var v = lsGet('vej-anon');
+    if (!v) { v = (window.crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2)).replace(/-/g, '').slice(0, 24); lsSet('vej-anon', v); }
+    return v;
+  }
+  function evento(tipo, juego) {
+    if (!navigator.onLine) return;
+    var b = { evento: tipo, anon: anon() }; if (juego) b.juego = juego;
+    try { fetch(CFG.API + '/api/eventos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b), keepalive: true }).catch(function () { }); } catch (e) { }
+  }
+  VEJ.evento = evento;
+
+  /* ── vistas ── */
+  var raiz = document.getElementById('app'), limpiezas = [];
+  function limpiar() { while (limpiezas.length) { try { limpiezas.pop()(); } catch (e) { } } }
+  VEJ.alSalir = function (fn) { limpiezas.push(fn); };
+  function pintar() {
+    limpiar(); raiz.innerHTML = '';
+    var cen = h('div', { class: 'cen' }); add(cen, Array.prototype.slice.call(arguments));
+    raiz.appendChild(h('div', { class: 'pag' }, cen)); window.scrollTo(0, 0); return cen;
+  }
+  function marcaLogo() {
+    if (MARCA.logo) return h('img', { src: MARCA.logo, alt: '', width: 48, height: 48 });
+    return svg('<svg viewBox="0 0 64 64" width="48" height="48"><rect width="64" height="64" fill="#F4FAFC"/><circle cx="32" cy="26" r="18" fill="none" stroke="#0B5FA5" stroke-width="3"/><circle cx="32" cy="26" r="12" fill="none" stroke="#0B5FA5" stroke-width="3"/><circle cx="32" cy="26" r="7" fill="#FFC93C"/><rect y="48" width="16" height="16" fill="#FFC93C"/><rect x="16" y="48" width="16" height="16" fill="#0B5FA5"/><rect x="32" y="48" width="16" height="16" fill="#D93A32"/><rect x="48" y="48" width="16" height="16" fill="#0C7F6D"/></svg>', 'logo-svg');
+  }
+  var franja = function () { return h('div', { class: 'franja', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'), h('i')); };
+  var enlaceTienda = function () { return MARCA.landingUrl || '/juegos/verano-en-juego/'; };
+
+  /* ── licencia ── */
+  var enc = new TextEncoder(), dec = new TextDecoder();
+  function b64(s) { var b = atob(s), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+  function b64u(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return b64(s); }
+  function deviceId() {
+    var d = lsGet('vej-device');
+    if (!d || !/^[A-Za-z0-9_-]{16,64}$/.test(d)) {
+      var u = new Uint8Array(18); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(u) : u.forEach(function (_, i) { u[i] = Math.floor(Math.random() * 256); });
+      d = btoa(String.fromCharCode.apply(null, u)).replace(/\+/g, '-').replace(/\//g, '_'); lsSet('vej-device', d);
+    }
+    return d;
+  }
+  // Devuelve el payload si la firma Ed25519 es válida (verificación local, SIN internet), o null.
+  // Si el navegador no sabe Ed25519, se confía en un token que el servidor ya validó al activar ('vej-verificada').
+  VEJ.verificarToken = function (token, pub) {
+    pub = pub || CFG.PUB;
+    return new Promise(function (ok) {
+      try {
+        var p = String(token || '').split('.'); if (p.length !== 3 || p[0] !== 'v1') return ok(null);
+        var payload = JSON.parse(dec.decode(b64u(p[1])));
+        if (!pub) return ok(null);
+        crypto.subtle.importKey('raw', b64(pub), { name: 'Ed25519' }, false, ['verify'])
+          .then(function (k) { return crypto.subtle.verify({ name: 'Ed25519' }, k, b64u(p[2]), enc.encode(p[0] + '.' + p[1])); })
+          .then(function (v) { ok(v ? payload : null); })
+          .catch(function (e) { ok(e && /NotSupported|Algorithm/i.test(e.name + e.message) && lsGet('vej-verificada') === '1' ? payload : null); });
+      } catch (e) { ok(null); }
+    });
+  };
+  function licenciaValida() {
+    var t = lsGet('vej-licencia'); if (!t) return Promise.resolve(null);
+    return VEJ.verificarToken(t).then(function (p) { return p && p.prod === CFG.PRODUCTO && p.dev === deviceId() ? p : null; });
+  }
+  function api(ruta, body) {
+    var ctrl = window.AbortController ? new AbortController() : null, t = ctrl && setTimeout(function () { ctrl.abort(); }, 12000);
+    return fetch(CFG.API + ruta, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctrl ? ctrl.signal : undefined })
+      .then(function (r) { clearTimeout(t); return r.json().catch(function () { return {}; }).then(function (j) { j._status = r.status; return j; }); })
+      .catch(function () { clearTimeout(t); return { ok: false, _status: 0, error: 'Sin conexión. Activá con internet una sola vez; después funciona sin conexión.' }; });
+  }
+  function activar(codigo) {
+    return api('/api/license/activate', { codigo: codigo, device_id: deviceId() }).then(function (r) {
+      if (r.ok && r.token) { lsSet('vej-licencia', r.token); lsSet('vej-verificada', '1'); lsDel('vej-revocada'); }
+      return r;
+    });
+  }
+  // Latido silencioso: si no hay internet, no pasa nada.
+  function latido() {
+    var t = lsGet('vej-licencia'); if (!t || !navigator.onLine) return;
+    api('/api/license/check', { token: t, device_id: deviceId() }).then(function (r) {
+      if (r && r.ok && r.estado === 'otro_dispositivo') { lsDel('vej-licencia'); lsSet('vej-revocada', '1'); vistaOtro(); }
+    });
+  }
+
+  function formatoCodigo(v) {
+    var s = String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 14);
+    return s.slice(0, 6) + (s.length > 6 ? '-' + s.slice(6, 10) : '') + (s.length > 10 ? '-' + s.slice(10, 14) : '');
+  }
+  function vistaBloqueo(motivo, codigoPrevio) {
+    var inp = h('input', { type: 'text', class: 'codigo', id: 'codigo', placeholder: 'VERANO-XXXX-XXXX', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', maxlength: 14, 'aria-label': 'Código de activación', value: codigoPrevio || '' });
+    var estado = h('div', { id: 'estado', role: 'status' }), btn;
+    var ir = function () {
+      var v = inp.value.trim(); if (!/^VERANO-[A-Z2-9]{4}-[A-Z2-9]{4}$/.test(formatoCodigo(v))) { mostrar('El código tiene la forma VERANO-XXXX-XXXX. Revisalo en tu mail.', 'mal'); inp.focus(); return; }
+      btn.disabled = true; btn.textContent = 'Activando…'; estado.innerHTML = '';
+      activar(v).then(function (r) { if (r.ok) vistaBienvenida(); else { btn.disabled = false; btn.textContent = 'Activar'; mostrar(r.error || 'No se pudo activar. Intentá de nuevo.', 'mal'); } });
+    };
+    function mostrar(t, tipo) { estado.innerHTML = ''; estado.appendChild(h('div', { class: 'msg ' + tipo }, t)); }
+    inp.addEventListener('input', function () { inp.value = formatoCodigo(inp.value); });
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') ir(); });
+    btn = h('button', { class: 'btn grande', type: 'button', onclick: ir }, 'Activar');
+    pintar(
+      h('div', { class: 'marca' }, marcaLogo(), h('b', null, MARCA.nombre)),
+      franja(),
+      h('h1', { class: 'disp', style: 'font-size:clamp(32px,9vw,48px);line-height:1' }, motivo === 'otro' ? 'Esta app se activó en otro dispositivo.' : 'Activá tu app'),
+      h('p', null, motivo === 'otro' ? 'Si ahora vas a jugar en este celu, pedí un link nuevo con el botón “Ya la compré”.' : 'Ingresá el código que te llegó por mail. Se activa una sola vez y después funciona sin internet.'),
+      h('div', { class: 'tarjeta' }, h('label', { for: 'codigo' }, 'Código de activación'), inp, estado, btn),
+      h('div', { class: 'fila' },
+        h('a', { class: 'btn sol', href: (MARCA.recuperarUrl || '/juegos/verano-en-juego/ya-la-compre/') + (motivo === 'otro' ? '?motivo=otro' : '') }, 'Ya la compré'),
+        h('a', { class: 'btn linea', href: enlaceTienda() }, 'Descargar'))
+    );
+    if (codigoPrevio) inp.value = formatoCodigo(codigoPrevio);
+  }
+  function vistaOtro() { vistaBloqueo('otro'); }
+  function vistaActivando(codigo) {
+    pintar(h('div', { class: 'marca' }, marcaLogo(), h('b', null, MARCA.nombre)), franja(), h('h1', { class: 'disp', style: 'font-size:34px' }, 'Activando…'), h('p', null, 'Un momento, estamos activando tu app.'));
+    activar(codigo).then(function (r) { if (r.ok) vistaBienvenida(); else { vistaBloqueo(null, codigo); var e = document.getElementById('estado'); if (e) e.appendChild(h('div', { class: 'msg mal' }, r.error || 'No se pudo activar.')); } });
+  }
+
+  /* instalación */
+  var promptInstalar = null;
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); promptInstalar = e; var b = document.getElementById('btn-instalar'); if (b) b.hidden = false; });
+  var esStandalone = function () { return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; };
+  var esIOS = function () { return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); };
+  function bloqueInstalar() {
+    if (esStandalone()) return null;
+    var pasos = esIOS() ? ['Tocá Compartir (el cuadradito con la flecha hacia arriba).', 'Elegí “Agregar a pantalla de inicio”.', 'Abrí el ícono que quedó en tu pantalla.']
+      : ['Tocá “Instalar la app”.', 'Confirmá en el cartel que aparece.', 'Abrila desde tu pantalla de inicio.'];
+    return h('div', { class: 'tarjeta' }, h('h3', { style: 'font-size:24px' }, 'Instalala en tu celu'),
+      h('ol', { style: 'margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px' }, pasos.map(function (p) { return h('li', null, p); })),
+      !esIOS() ? h('button', { class: 'btn sol', id: 'btn-instalar', type: 'button', hidden: !promptInstalar, onclick: function () { if (promptInstalar) { promptInstalar.prompt(); promptInstalar = null; } } }, 'Instalar la app') : null);
+  }
+  function vistaBienvenida() {
+    pintar(h('div', { class: 'marca' }, marcaLogo(), h('b', null, MARCA.nombre)), franja(),
+      h('h1', { class: 'disp', style: 'font-size:clamp(32px,9vw,48px);line-height:1' }, '¡Listo! Tu app está activada.'),
+      h('p', null, 'Ya podés jugar sin internet. Tus avances quedan guardados en este celu.'),
+      bloqueInstalar(),
+      h('button', { class: 'btn grande sol', type: 'button', onclick: vistaInicio }, 'Empezar a jugar'));
+  }
+
+  /* ── progreso y niveles ── */
+  function prog(id) { return jget('vej-prog-' + id, { hechos: {} }); }
+  function guardarProg(id, p) { lsSet('vej-prog-' + id, JSON.stringify(p)); }
+  function maxDesbloqueado(g) {
+    var p = prog(g.id), m = 0; for (var k in p.hechos) m = Math.max(m, +k);
+    var n = Math.min(m + 1, g.niveles);
+    
+    return n;
+  }
+  VEJ.progreso = { get: prog, max: maxDesbloqueado };
+  var COLORES = ['azul', 'sol', 'coral', 'verde'];
+
+  /* ── registro de juegos ── */
+  VEJ.juego = function (g) { g.color = g.color || COLORES[VEJ.juegos.length % 4]; VEJ.juegos.push(g); };
+  function juegosVisibles() {
+    var inc = MARCA.juegos; var l = VEJ.juegos.filter(function (g) { return !inc || inc === 'todos' || inc.indexOf(g.id) >= 0; });
+    return l.map(function (g, i) { g.color = COLORES[i % 4]; return g; });
+  }
+
+  function vistaInicio() {
+    var lista = juegosVisibles(), p = MARCA.portada || {};
+    var grid = h('div', { class: 'grid-j' }, lista.map(function (g, i) {
+      var sub = g.tipo === 'niveles' ? (function () { var m = maxDesbloqueado(g); var hecho = Object.keys(prog(g.id).hechos).length; return hecho ? hecho + ' de ' + g.niveles + ' niveles' : g.niveles + ' niveles'; })() : null;
+      return h('button', { class: 'j ' + g.color, type: 'button', onclick: function () { abrirJuego(g); } },
+        h('small', null, pad2(i + 1)), h('div', { style: 'display:flex;flex-direction:column;gap:4px' }, h('h3', null, g.nombre), h('p', null, g.desc), sub ? h('span', { class: 'prog' }, sub) : null));
+    }));
+    var inst = bloqueInstalar();
+    var dev = null; 
+    pintar(
+      h('div', { class: 'marca' }, marcaLogo(), h('b', null, MARCA.nombre)),
+      franja(),
+      h('div', { class: 'hero' }, h('h1', { class: 'disp' }, p.titulo || MARCA.nombre), p.subtitulo ? h('p', { style: 'margin-top:8px' }, p.subtitulo) : null),
+      inst, dev, grid,
+      h('div', { style: 'display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;padding-top:6px' },
+        MARCA.contacto && MARCA.contacto.url ? h('a', { class: 'btn linea chico', href: MARCA.contacto.url, style: 'color:var(--fg)' }, MARCA.contacto.texto || 'Contacto') : null,
+        h('span', { style: 'font-size:14px;color:var(--muted)' }, 'Funciona sin internet. Tus avances se guardan en este dispositivo.'))
+    );
+  }
+
+  function barra(titulo, volverTxt, volverFn, extra) {
+    return h('div', { class: 'barra' }, h('button', { class: 'btn chico linea', type: 'button', style: 'color:var(--fg)', onclick: volverFn }, volverTxt || 'Volver'), h('h2', null, titulo), extra || null);
+  }
+  function abrirJuego(g) {
+    evento('juego_abierto', g.id);
+    if (g.tipo === 'niveles') return vistaNiveles(g);
+    jugar(g, 0);
+  }
+  function vistaNiveles(g, pagina) {
+    var p = prog(g.id), maxN = maxDesbloqueado(g), porPag = 50, pags = Math.ceil(g.niveles / porPag);
+    pagina = pagina != null ? pagina : Math.floor((maxN - 1) / porPag);
+    var tabs = pags > 1 ? h('div', { class: 'pestanas', role: 'group', 'aria-label': 'Tandas de niveles' }, Array.apply(null, Array(pags)).map(function (_, i) {
+      return h('button', { type: 'button', 'aria-pressed': i === pagina ? 'true' : 'false', onclick: function () { vistaNiveles(g, i); } }, (i * porPag + 1) + '–' + Math.min((i + 1) * porPag, g.niveles));
+    })) : null;
+    var celdas = [];
+    for (var n = pagina * porPag + 1; n <= Math.min((pagina + 1) * porPag, g.niveles); n++) (function (n) {
+      var est = p.hechos[n], bloq = n > maxN;
+      celdas.push(h('button', { class: 'niv' + (est ? ' hecho' : (n === maxN ? ' actual' : '')), type: 'button', disabled: bloq, 'aria-label': 'Nivel ' + n + (est ? ', completado' : bloq ? ', bloqueado' : ''), onclick: function () { jugar(g, n); } },
+        String(n), est ? h('small', null, '★'.repeat(est)) : null));
+    })(n);
+    pintar(barra(g.nombre, 'Inicio', vistaInicio),
+      h('p', null, 'Completá cada nivel para abrir el siguiente.'),
+      h('button', { class: 'btn grande sol', type: 'button', onclick: function () { jugar(g, maxN); } }, 'Continuar: nivel ' + maxN),
+      tabs, h('div', { class: 'niveles' }, celdas));
+  }
+  function estrellasSvg(n) {
+    var out = ''; for (var i = 0; i < 3; i++) out += '<svg viewBox="0 0 24 24"><path d="M12 2l3 6.9 7.5.7-5.7 5 1.7 7.4L12 18l-6.5 4 1.7-7.4-5.7-5 7.5-.7z" fill="' + (i < n ? '#FFC93C' : 'rgba(255,255,255,.25)') + '"/></svg>';
+    return out;
+  }
+  function jugar(g, nivel) {
+    var cuerpo = h('div', { class: 'area' });
+    var titulo = g.tipo === 'niveles' ? g.nombre + ' · ' + nivel : g.nombre;
+    var salir = g.tipo === 'niveles' ? function () { vistaNiveles(g); } : vistaInicio;
+    pintar(barra(titulo, g.tipo === 'niveles' ? 'Niveles' : 'Inicio', salir), cuerpo);
+    var ctx = {
+      nivel: nivel, volver: salir, limpiar: VEJ.alSalir, rng: rng, evento: evento,
+      ganar: function (estrellas) {
+        var p = prog(g.id); estrellas = Math.max(1, Math.min(3, estrellas || 3)); p.hechos[nivel] = Math.max(p.hechos[nivel] || 0, estrellas); guardarProg(g.id, p);
+        var ultimo = nivel >= g.niveles;
+        var ov = h('div', { class: 'superpuesto', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Nivel completo' }, h('div', { class: 'caja' },
+          h('h2', { class: 'disp' }, ultimo ? '¡Completaste todos!' : '¡Nivel completo!'), svg(estrellasSvg(estrellas), 'estrellas'),
+          !ultimo ? h('button', { class: 'btn grande sol', type: 'button', onclick: function () { jugar(g, nivel + 1); } }, 'Siguiente nivel') : null,
+          h('button', { class: 'btn linea', type: 'button', onclick: function () { vistaNiveles(g); } }, 'Ver niveles')));
+        document.body.appendChild(ov); VEJ.alSalir(function () { ov.remove(); }); var b = ov.querySelector('button'); if (b) b.focus();
+      },
+      reiniciar: function () { jugar(g, nivel); }
+    };
+    g.montar(cuerpo, ctx);
+  }
+  VEJ.volverInicio = vistaInicio;
+
+  /* ── arranque ── */
+  function arrancar() {
+    var cod = null; try { cod = new URLSearchParams(location.search).get('activar'); } catch (e) { }
+    licenciaValida().then(function (lic) {
+      if (lic) { vistaInicio(); latido(); evento('pagina_vista'); return; }
+      if (cod) { vistaActivando(cod); return; }
+      if (lsGet('vej-revocada') === '1') { vistaOtro(); return; }
+      vistaBloqueo();
+    });
+    if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('/juegos/sw.js', { scope: '/juegos/' }).catch(function () { }); });
+  }
+  VEJ.arrancar = arrancar;
+  window.addEventListener('online', latido);
+  
+})();
+
+;
+/* Juegos de mesa (sin niveles): Impostor, Tutti frutti, Mímica, ¿Quién es más probable?, Desafíos de verano */
+(function () {
+  var U = VEJ.util, h = U.h, mezclar = U.mezclar, azar = U.azar, tiempo = U.tiempo;
+
+  // ── componentes comunes ──
+  function selector(opciones, valor, alCambiar, etiqueta) {
+    var caja = h('div', { class: 'sel', role: 'group', 'aria-label': etiqueta });
+    function pintar() { caja.innerHTML = ''; opciones.forEach(function (o) { caja.appendChild(h('button', { type: 'button', 'aria-pressed': String(o.v === valor), onclick: function () { valor = o.v; alCambiar(valor); pintar(); } }, o.t)); }); }
+    pintar(); return caja;
+  }
+  function contador(el, desde, alTerminar, ctx) {
+    // Cuenta regresiva grande (para turnos con tiempo). Devuelve {parar, tiempo}
+    var seg = desde, vista = h('div', { class: 'gran', style: 'font-size:clamp(56px,20vw,110px)', 'aria-live': 'off' }, tiempo(seg)), id;
+    el.appendChild(vista);
+    id = setInterval(function () { seg--; vista.textContent = tiempo(Math.max(seg, 0)); if (seg <= 0) { clearInterval(id); alTerminar(); } }, 1000);
+    ctx.limpiar(function () { clearInterval(id); });
+    return { parar: function () { clearInterval(id); }, restante: function () { return seg; } };
+  }
+  function vibrar(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) { } }
+
+  /* ───────── 1. IMPOSTOR ───────── */
+  var PALABRAS = {
+    'Verano': ['Pileta', 'Protector solar', 'Helado', 'Reposera', 'Sombrilla', 'Ojotas', 'Mate', 'Carpa', 'Choclo', 'Ventilador', 'Piel de sol', 'Arena', 'Cucha', 'Ensalada de frutas', 'Fogón', 'Heladera', 'Siesta', 'Colectivo', 'Balde', 'Salvavidas'],
+    'Comidas': ['Asado', 'Milanesa', 'Empanada', 'Pizza', 'Ñoquis', 'Locro', 'Alfajor', 'Dulce de leche', 'Provoleta', 'Choripán', 'Fideos', 'Flan', 'Tarta', 'Sándwich de miga', 'Torta frita'],
+    'Lugares': ['Playa', 'Cine', 'Escuela', 'Hospital', 'Aeropuerto', 'Supermercado', 'Estadio', 'Biblioteca', 'Terminal de micros', 'Camping', 'Plaza', 'Banco', 'Museo', 'Peluquería', 'Casino'],
+    'Animales': ['Perro', 'Gato', 'Caballo', 'Pingüino', 'Delfín', 'Zorro', 'Loro', 'Tortuga', 'Carpincho', 'Jirafa', 'Cangrejo', 'Hormiga', 'Mono', 'Pulpo', 'Murciélago']
+  };
+  VEJ.juego({
+    id: 'impostor', nombre: 'Impostor', desc: 'Uno no sabe la palabra. ¿Quién es?', tipo: 'mesa',
+    montar: function (el, ctx) {
+      var cfg = { jugadores: 5, cat: 'Verano', impostores: 1 };
+      function config() {
+        el.innerHTML = '';
+        el.appendChild(h('div', { class: 'tarjeta', style: 'width:100%' },
+          h('p', null, 'Todos reciben la misma palabra menos el impostor. Pasen el celu de a uno: cada jugador mira en secreto y lo vuelve a pasar.'),
+          h('label', null, 'Jugadores'), selector([3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (n) { return { v: n, t: String(n) }; }), cfg.jugadores, function (v) { cfg.jugadores = v; if (cfg.impostores >= v) cfg.impostores = 1; }, 'Cantidad de jugadores'),
+          h('label', null, 'Categoría'), selector(Object.keys(PALABRAS).map(function (k) { return { v: k, t: k }; }), cfg.cat, function (v) { cfg.cat = v; }, 'Categoría'),
+          h('label', null, 'Impostores'), selector([1, 2].map(function (n) { return { v: n, t: String(n) }; }), cfg.impostores, function (v) { cfg.impostores = v; }, 'Cantidad de impostores'),
+          h('button', { class: 'btn grande sol', type: 'button', onclick: empezar }, 'Empezar')));
+      }
+      function empezar() {
+        var n = cfg.jugadores, imp = Math.min(cfg.impostores, Math.max(1, Math.floor((n - 1) / 2))), palabra = azar(PALABRAS[cfg.cat]);
+        var roles = mezclar(Array.apply(null, Array(n)).map(function (_, i) { return i < imp ? 'imp' : 'ok'; })), turno = 0;
+        function pasar() {
+          el.innerHTML = '';
+          if (turno >= n) return discusion();
+          el.appendChild(h('div', { class: 'tarjeta centro', style: 'width:100%' }, h('h3', { style: 'font-size:30px' }, 'Jugador ' + (turno + 1) + ' de ' + n),
+            h('p', null, 'Tocá para ver tu palabra. Que nadie más mire.'),
+            h('button', { class: 'btn grande', type: 'button', onclick: ver }, 'Ver mi palabra')));
+        }
+        function ver() {
+          el.innerHTML = '';
+          var rol = roles[turno];
+          el.appendChild(h('div', { class: 'tarjeta centro oscuro', style: 'width:100%;background:' + (rol === 'imp' ? 'var(--coral)' : 'var(--azul)') },
+            h('p', null, rol === 'imp' ? 'Sos el' : 'La palabra es'),
+            h('div', { class: 'gran', style: 'font-size:clamp(40px,13vw,72px);word-break:break-word' }, rol === 'imp' ? 'IMPOSTOR' : palabra),
+            h('p', null, rol === 'imp' ? 'Disimulá y tratá de adivinar la palabra.' : 'No la digas. Da pistas sin ser obvio.'),
+            h('button', { class: 'btn grande sol', type: 'button', onclick: function () { turno++; pasar(); } }, 'Ya la vi, pasar el celu')));
+        }
+        function discusion() {
+          el.appendChild(h('div', { class: 'tarjeta centro', style: 'width:100%' }, h('h3', { style: 'font-size:30px' }, 'A debatir'),
+            h('p', null, 'Cada uno dice una palabra relacionada, una por vuelta. Después votan al impostor.'),
+            h('div', { id: 'tiempo' }),
+            h('button', { class: 'btn grande coral', type: 'button', onclick: revelar }, 'Revelar al impostor')));
+          contador(el.querySelector('#tiempo'), 180, function () { vibrar(400); }, ctx);
+        }
+        function revelar() {
+          var quienes = []; roles.forEach(function (r, i) { if (r === 'imp') quienes.push('Jugador ' + (i + 1)); });
+          el.innerHTML = '';
+          el.appendChild(h('div', { class: 'tarjeta centro', style: 'width:100%' }, h('p', null, 'La palabra era'), h('div', { class: 'gran', style: 'font-size:clamp(36px,12vw,64px)' }, palabra),
+            h('p', null, (quienes.length > 1 ? 'Los impostores eran: ' : 'El impostor era: ') + quienes.join(' y ')),
+            h('button', { class: 'btn grande sol', type: 'button', onclick: empezar }, 'Otra ronda'), h('button', { class: 'btn linea', type: 'button', style: 'color:var(--fg)', onclick: config }, 'Cambiar ajustes')));
+        }
+        pasar();
+      }
+      config();
+    }
+  });
+
+  /* ───────── 2. TUTTI FRUTTI ───────── */
+  var CATS = ['Nombre', 'Apellido', 'Animal', 'Fruta o verdura', 'País o ciudad', 'Color', 'Objeto', 'Comida', 'Profesión', 'Cosa de la playa', 'Marca', 'Película o serie', 'Deporte', 'Parte del cuerpo', 'Canción'];
+  VEJ.juego({
+    id: 'tutti-frutti', nombre: 'Tutti frutti', desc: 'Una letra, todas las categorías, a escribir rápido.', tipo: 'mesa',
+    montar: function (el, ctx) {
+      var LETRAS = 'ABCDEFGHIJLMNOPRSTUV'.split(''), usadas = [], cfg = { tiempo: 90, cats: 6 };
+      function config() {
+        el.innerHTML = '';
+        el.appendChild(h('div', { class: 'tarjeta', style: 'width:100%' },
+          h('p', null, 'Con papel y lápiz: salta una letra y cada uno completa las categorías con palabras que empiecen con ella. Gana el que más tiene.'),
+          h('label', null, 'Categorías por ronda'), selector([5, 6, 8, 10].map(function (n) { return { v: n, t: String(n) }; }), cfg.cats, function (v) { cfg.cats = v; }, 'Categorías'),
+          h('label', null, 'Tiempo'), selector([{ v: 60, t: '1 min' }, { v: 90, t: '1:30' }, { v: 120, t: '2 min' }, { v: 0, t: 'Sin tiempo' }], cfg.tiempo, function (v) { cfg.tiempo = v; }, 'Tiempo'),
+          h('button', { class: 'btn grande sol', type: 'button', onclick: ronda }, 'Sacar letra')));
+      }
+      function ronda() {
+        if (usadas.length >= LETRAS.length) usadas = [];
+        var l = azar(LETRAS.filter(function (x) { return usadas.indexOf(x) < 0; })); usadas.push(l);
+        var cats = mezclar(CATS).slice(0, cfg.cats); el.innerHTML = '';
+        var terminado = false;
+        el.appendChild(h('div', { class: 'tarjeta centro oscuro', style: 'width:100%;background:var(--azul)' }, h('p', null, 'La letra es'), h('div', { class: 'gran', style: 'font-size:clamp(100px,38vw,200px)' }, l)));
+        el.appendChild(h('div', { class: 'tarjeta', style: 'width:100%' }, h('h3', { style: 'font-size:22px' }, 'Categorías'), h('ol', { style: 'margin:0;padding-left:1.3em;font-size:20px;display:flex;flex-direction:column;gap:4px' }, cats.map(function (c) { return h('li', null, c); }))));
+        var barra = h('div', { class: 'centro', style: 'width:100%' });
+        el.appendChild(barra);
+        if (cfg.tiempo) contador(barra, cfg.tiempo, function () { if (!terminado) { terminado = true; vibrar(500); alert_basta('¡Tiempo!'); } }, ctx);
+        el.appendChild(h('div', { class: 'fila', style: 'width:100%' },
+          h('button', { class: 'btn grande coral', type: 'button', onclick: function () { terminado = true; alert_basta('¡Basta para todos!'); } }, '¡Basta!'),
+          h('button', { class: 'btn linea', type: 'button', style: 'color:var(--fg)', onclick: ronda }, 'Otra letra')));
+        function alert_basta(t) { barra.innerHTML = ''; barra.appendChild(h('div', { class: 'msg info' }, t + ' Dejen de escribir y comparen respuestas.')); }
+      }
+      config();
+    }
+  });
+
+  /* ───────── 3. MÍMICA ───────── */
+  var MIMICA = {
+    'Fácil': ['Dormir', 'Nadar', 'Cocinar', 'Cepillarse los dientes', 'Manejar', 'Bailar', 'Llorar de risa', 'Tomar mate', 'Hablar por teléfono', 'Sacar una foto', 'Jugar al fútbol', 'Pescar', 'Pasear al perro', 'Tocar la guitarra', 'Comer un helado'],
+    'Medio': ['Un pingüino', 'Armar una carpa', 'Cebar mate', 'Policía de tránsito', 'Surfear', 'Hacer un asado', 'Un mozo con bandeja', 'Esquiar', 'Abrir un paraguas con viento', 'Una película de terror', 'Bañar a un gato', 'Hacer surf de remo', 'Un astronauta', 'Peluquero', 'Pasar la aspiradora'],
+    'Difícil': ['Perder el micro', 'Quedarse sin batería', 'Un abuelo con el control remoto', 'Cantar en el karaoke', 'Escapar de una abeja', 'Una ola gigante', 'Encontrar una cucaracha', 'Armar un mueble sin manual', 'Reír con la boca llena', 'Un robot sin batería', 'Dar la bienvenida a los invitados', 'Perderse en el shopping']
+  };
+  VEJ.juego({
+    id: 'mimica', nombre: 'Mímica', desc: 'Actuá sin hablar y que los demás adivinen.', tipo: 'mesa',
+    montar: function (el, ctx) {
+      var cfg = { dif: 'Fácil', tiempo: 60 }, aciertos = 0, mazo = [];
+      function config() {
+        el.innerHTML = '';
+        el.appendChild(h('div', { class: 'tarjeta', style: 'width:100%' }, h('p', null, 'Uno actúa sin hablar, el resto adivina. Cuando aciertan, tocá “Acertaron”. Si es muy difícil, “Pasar”.'),
+          h('label', null, 'Dificultad'), selector(Object.keys(MIMICA).map(function (k) { return { v: k, t: k }; }), cfg.dif, function (v) { cfg.dif = v; }, 'Dificultad'),
+          h('label', null, 'Tiempo por turno'), selector([{ v: 45, t: '45 s' }, { v: 60, t: '1 min' }, { v: 90, t: '1:30' }], cfg.tiempo, function (v) { cfg.tiempo = v; }, 'Tiempo'),
+          h('button', { class: 'btn grande sol', type: 'button', onclick: preparar }, 'Armar turno')));
+      }
+      function preparar() {
+        el.innerHTML = ''; aciertos = 0; mazo = mezclar(MIMICA[cfg.dif]);
+        el.appendChild(h('div', { class: 'tarjeta centro', style: 'width:100%' }, h('h3', { style: 'font-size:28px' }, 'Pasale el celu al que va a actuar'), h('p', null, 'Los demás no miren la pantalla.'),
+          h('button', { class: 'btn grande', type: 'button', onclick: turno }, 'Listo, empezar')));
+      }
+      function turno() {
+        el.innerHTML = ''; var fin = false;
+        var palabra = h('div', { class: 'gran', style: 'font-size:clamp(34px,11vw,60px);min-height:2.4em;display:flex;align-items:center;justify-content:center;word-break:break-word' });
+        var marcador = h('span', null, 'Aciertos: 0'), zonaT = h('div', { class: 'centro' });
+        function sig() { if (!mazo.length) mazo = mezclar(MIMICA[cfg.dif]); palabra.textContent = mazo.pop(); }
+        el.appendChild(h('div', { class: 'estado' }, marcador));
+        el.appendChild(zonaT);
+        el.appendChild(h('div', { class: 'tarjeta centro oscuro', style: 'width:100%;background:var(--azul)' }, palabra));
+        var bs = h('div', { class: 'fila', style: 'width:100%' },
+          h('button', { class: 'btn grande verde', type: 'button', onclick: function () { if (fin) return; aciertos++; marcador.textContent = 'Aciertos: ' + aciertos; sig(); } }, 'Acertaron'),
+          h('button', { class: 'btn grande linea', type: 'button', style: 'color:var(--fg)', onclick: function () { if (!fin) sig(); } }, 'Pasar'));
+        el.appendChild(bs); sig();
+        contador(zonaT, cfg.tiempo, function () { fin = true; vibrar(500); el.innerHTML = ''; el.appendChild(h('div', { class: 'tarjeta centro', style: 'width:100%' }, h('h3', { style: 'font-size:30px' }, '¡Se acabó el tiempo!'), h('div', { class: 'gran', style: 'font-size:72px' }, String(aciertos)), h('p', null, aciertos === 1 ? 'palabra acertada' : 'palabras acertadas'),
+          h('button', { class: 'btn grande sol', type: 'button', onclick: preparar }, 'Siguiente turno'), h('button', { class: 'btn linea', type: 'button', style: 'color:var(--fg)', onclick: config }, 'Cambiar ajustes'))); }, ctx);
+      }
+      config();
+    }
+  });
+
+  /* ───────── 4. ¿QUIÉN ES MÁS PROBABLE? ───────── */
+  var PROBABLE = [
+    '¿Quién es más probable que se quede dormido en la playa?', '¿Quién es más probable que pierda las llaves en las vacaciones?', '¿Quién es más probable que le pida una foto a un famoso?', '¿Quién es más probable que se meta al agua con ropa?',
+    '¿Quién es más probable que llegue tarde al micro?', '¿Quién es más probable que se enamore de un compañero de viaje?', '¿Quién es más probable que se quede sin batería en el peor momento?', '¿Quién es más probable que gane un concurso de baile?',
+    '¿Quién es más probable que se pierda con el mapa en la mano?', '¿Quién es más probable que coma el último pedazo sin preguntar?', '¿Quién es más probable que se queme la espalda por no ponerse protector?', '¿Quién es más probable que se haga amigo de todos en el camping?',
+    '¿Quién es más probable que cuente el mismo chiste cinco veces?', '¿Quién es más probable que se ría en un momento serio?', '¿Quién es más probable que se olvide del cumpleaños de alguien?', '¿Quién es más probable que le dé miedo una gaviota?',
+    '¿Quién es más probable que organice todo el viaje?', '¿Quién es más probable que se quede dormido en el cine?', '¿Quién es más probable que invente una excusa para no cocinar?', '¿Quién es más probable que termine cantando en el karaoke?',
+    '¿Quién es más probable que se cuele en una fila?', '¿Quién es más probable que haga un asado perfecto?', '¿Quién es más probable que vuelva con arena hasta en la mochila?', '¿Quién es más probable que se gaste todo el dinero en souvenirs?',
+    '¿Quién es más probable que le cante a alguien en la calle?', '¿Quién es más probable que sea el último en dormirse?', '¿Quién es más probable que llore viendo una película?', '¿Quién es más probable que sobreviva en una isla desierta?'
+  ];
+  VEJ.juego({
+    id: 'quien-es-mas-probable', nombre: '¿Quién es más probable?', desc: 'Señalen al que se la merece.', tipo: 'mesa',
+    montar: function (el, ctx) {
+      var mazo = mezclar(PROBABLE), n = 0;
+      function carta() {
+        el.innerHTML = ''; if (!mazo.length) mazo = mezclar(PROBABLE); n++;
+        var txt = mazo.pop();
+        el.appendChild(h('div', { class: 'tarjeta centro oscuro', style: 'width:100%;background:var(--coral);min-height:240px;justify-content:center' }, h('p', { style: 'font-size:14px;letter-spacing:.1em;font-weight:700' }, 'PREGUNTA ' + n), h('p', { class: 'gran', style: 'font-size:clamp(26px,8vw,40px);line-height:1.1' }, txt)));
+        el.appendChild(h('p', { class: 'centro' }, 'A la cuenta de tres, todos señalan a la vez.'));
+        el.appendChild(h('div', { class: 'fila', style: 'width:100%' }, h('button', { class: 'btn grande sol', type: 'button', onclick: cuenta }, 'A la una, a las dos…'), h('button', { class: 'btn grande', type: 'button', onclick: carta }, 'Otra pregunta')));
+      }
+      function cuenta() {
+        var ov = h('div', { class: 'superpuesto', role: 'dialog', 'aria-label': 'Cuenta regresiva' }), c = 3, num = h('div', { class: 'gran cuenta', style: 'color:#fff' }, '3');
+        ov.appendChild(h('div', { class: 'centro' }, num)); document.body.appendChild(ov);
+        var id = setInterval(function () { c--; if (c > 0) num.textContent = c; else if (c === 0) { num.textContent = '¡Señalen!'; num.style.fontSize = 'clamp(48px,16vw,100px)'; vibrar(300); } else { clearInterval(id); ov.remove(); } }, 900);
+        ctx.limpiar(function () { clearInterval(id); ov.remove(); });
+      }
+      carta();
+    }
+  });
+
+  /* ───────── 5. DESAFÍOS DE VERANO ───────── */
+  var RETOS = {
+    'Pileta': ['Aguantá la respiración bajo el agua lo más que puedas. El que menos aguanta, paga un helado.', 'Hacé la mejor entrada al agua. Que el resto le ponga puntaje de 1 a 10.', 'Nadá un largo sin usar las piernas.', 'Hacé una coreografía de nado sincronizado entre dos.', 'Tirate de panza. El grupo puntúa.', 'Mantené una pelota en el aire sin salir del agua, un minuto.'],
+    'Playa': ['Hacé un castillo de arena con los ojos cerrados. Los demás lo juzgan.', 'Encontrá tres cosas de tres colores distintos en 2 minutos.', 'Escribí un mensaje en la arena sin usar las manos.', 'Corré hasta el agua y volvé caminando hacia atrás.', 'Entrá al mar contando un chiste a los gritos.', 'Hacé una escultura de arena de alguien del grupo.'],
+    'Mesa': ['Hablá 30 segundos sin decir “sí” ni “no”.', 'Imitá a alguien del grupo hasta que lo adivinen.', 'Contá una anécdota de verano en 20 segundos exactos.', 'Inventá un eslogan para el vaso que tenés enfrente.', 'Hacé reír a alguien sin tocarlo ni hablar.', 'Describí tu verano ideal usando solo tres palabras por frase.', 'Cantá el estribillo de una canción cambiando todas las vocales por “a”.']
+  };
+  VEJ.juego({
+    id: 'desafios', nombre: 'Desafíos de verano', desc: 'Retos para la pileta, la playa o la mesa.', tipo: 'mesa',
+    montar: function (el, ctx) {
+      var lugar = 'Mesa', mazos = {};
+      function pantalla() {
+        el.innerHTML = '';
+        el.appendChild(h('div', { class: 'tarjeta', style: 'width:100%' }, h('label', null, '¿Dónde están?'), selector(Object.keys(RETOS).map(function (k) { return { v: k, t: k }; }), lugar, function (v) { lugar = v; }, 'Lugar'), h('button', { class: 'btn grande sol', type: 'button', onclick: sacar }, 'Sacar un desafío')));
+      }
+      function sacar() {
+        if (!mazos[lugar] || !mazos[lugar].length) mazos[lugar] = mezclar(RETOS[lugar]);
+        var r = mazos[lugar].pop(); el.innerHTML = '';
+        el.appendChild(h('div', { class: 'tarjeta centro oscuro', style: 'width:100%;background:var(--verde);min-height:220px;justify-content:center' }, h('p', { style: 'font-size:14px;letter-spacing:.1em;font-weight:700' }, lugar.toUpperCase()), h('p', { class: 'gran', style: 'font-size:clamp(24px,7vw,34px);line-height:1.15' }, r)));
+        var t = h('div', { class: 'centro', style: 'width:100%' }); el.appendChild(t);
+        el.appendChild(h('div', { class: 'fila', style: 'width:100%' }, h('button', { class: 'btn grande', type: 'button', onclick: function () { t.innerHTML = ''; contador(t, 30, function () { vibrar(400); }, ctx); } }, 'Cronómetro 30 s'), h('button', { class: 'btn grande sol', type: 'button', onclick: sacar }, 'Otro desafío')));
+        el.appendChild(h('button', { class: 'btn linea', type: 'button', style: 'color:var(--fg)', onclick: pantalla }, 'Cambiar de lugar'));
+      }
+      pantalla();
+    }
+  });
+})();
+
+;
+/* Memotest — 150 niveles. Las parejas son símbolos geométricos (forma × color de la marca). */
+(function () {
+  var U = VEJ.util, h = U.h, L = VEJ.lib;
+  var COL = ['#0B5FA5', '#FFC93C', '#D93A32', '#0C7F6D'], FORMAS = [
+    function (c) { return '<circle cx="50" cy="50" r="30" fill="' + c + '"/>'; },
+    function (c) { return '<rect x="22" y="22" width="56" height="56" rx="8" fill="' + c + '"/>'; },
+    function (c) { return '<path d="M50 18 L84 78 L16 78 Z" fill="' + c + '"/>'; },
+    function (c) { return '<path d="M50 14l10.6 24.4 26.4 2.4-20 17.6 6 26L50 70.4 27 84.4l6-26-20-17.6 26.4-2.4z" fill="' + c + '"/>'; },
+    function (c) { return '<path d="M50 14 L84 50 L50 86 L16 50 Z" fill="' + c + '"/>'; },
+    function (c) { return '<path d="M38 16h24v22h22v24H62v22H38V62H16V38h22z" fill="' + c + '"/>'; }
+  ];
+  function simbolo(i) { return '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true">' + FORMAS[i % 6](COL[((i / 6) | 0) % 4]) + '</svg>'; }
+  var NOMBRES = ['círculo', 'cuadrado', 'triángulo', 'estrella', 'rombo', 'cruz'], COLN = ['azul', 'amarillo', 'rojo', 'verde'];
+  var nombre = function (i) { return NOMBRES[i % 6] + ' ' + COLN[((i / 6) | 0) % 4]; };
+
+  VEJ.juego({
+    id: 'memotest', nombre: 'Memotest', desc: '150 niveles para entrenar la memoria.', tipo: 'niveles', niveles: 150,
+    montar: function (el, ctx) {
+      var n = ctx.nivel, pares = Math.min(18, 3 + Math.floor((n - 1) / 10)), cartas = pares * 2;
+      var cols = cartas <= 12 ? 3 : cartas <= 16 ? 4 : cartas <= 20 ? 5 : 6;
+      var r = U.rng(n * 31337 + 5), simb = U.mezclar(Array.apply(null, Array(24)).map(function (_, i) { return i; }), r).slice(0, pares);
+      var mazo = U.mezclar(simb.concat(simb), r), abiertas = [], encontradas = 0, movs = 0, bloqueado = false, demora = n > 75 ? 550 : 800;
+      var estadoMov = h('span', null, 'Movimientos: 0'), estadoPar = h('span', null, 'Parejas: 0 de ' + pares);
+      var tab = h('div', { class: 'tablero', style: 'grid-template-columns:repeat(' + cols + ',1fr);gap:8px;max-width:min(100%,' + (cols * 110) + 'px)' });
+      var botones = mazo.map(function (s, i) {
+        var b = h('button', { type: 'button', class: 'carta', 'aria-label': 'Carta ' + (i + 1) + ', boca abajo', style: 'aspect-ratio:1;border:0;border-radius:16px;background:var(--azul);color:#fff;padding:0;min-height:56px;display:flex;align-items:center;justify-content:center;font:800 24px Bricolage Grotesque,sans-serif;box-shadow:0 4px 0 rgba(14,34,51,.25)', onclick: function () { voltear(i); } }, '?');
+        return b;
+      });
+      botones.forEach(function (b) { tab.appendChild(b); });
+      function mostrar(i) { var b = botones[i]; b.innerHTML = simbolo(mazo[i]); b.style.background = '#fff'; b.style.padding = '10%'; b.setAttribute('aria-label', 'Carta ' + (i + 1) + ': ' + nombre(mazo[i])); }
+      function ocultar(i) { var b = botones[i]; b.textContent = '?'; b.style.background = 'var(--azul)'; b.style.padding = '0'; b.setAttribute('aria-label', 'Carta ' + (i + 1) + ', boca abajo'); }
+      function voltear(i) {
+        if (bloqueado || abiertas.indexOf(i) >= 0 || botones[i].dataset.ok) return;
+        mostrar(i); abiertas.push(i);
+        if (abiertas.length < 2) return;
+        movs++; estadoMov.textContent = 'Movimientos: ' + movs;
+        var a = abiertas[0], b = abiertas[1]; abiertas = [];
+        if (mazo[a] === mazo[b]) {
+          botones[a].dataset.ok = botones[b].dataset.ok = '1'; botones[a].style.outline = botones[b].style.outline = '4px solid var(--verde)'; encontradas++; estadoPar.textContent = 'Parejas: ' + encontradas + ' de ' + pares;
+          if (encontradas === pares) setTimeout(function () { ctx.ganar(movs <= pares * 1.6 ? 3 : movs <= pares * 2.5 ? 2 : 1); }, 500);
+        } else {
+          bloqueado = true; var t = setTimeout(function () { ocultar(a); ocultar(b); bloqueado = false; }, demora); ctx.limpiar(function () { clearTimeout(t); });
+        }
+      }
+      el.appendChild(h('div', { class: 'estado' }, estadoMov, estadoPar));
+      el.appendChild(tab);
+      el.appendChild(h('button', { class: 'btn linea', type: 'button', style: 'color:var(--fg)', onclick: ctx.reiniciar }, 'Reiniciar nivel'));
+    }
+  });
+})();
+
+;
+/* Laberinto — 200 niveles. Se mueve deslizando el dedo (corre por el pasillo hasta una bifurcación), con los botones o con el teclado. */
+(function () {
+  var U = VEJ.util, h = U.h, L = VEJ.lib;
+  VEJ.juego({
+    id: 'laberinto', nombre: 'Laberinto', desc: '200 laberintos, cada vez más enredados.', tipo: 'niveles', niveles: 200,
+    montar: function (el, ctx) {
+      var m = L.laberinto(ctx.nivel), n = m.n, D = L.laberintoDirs, mejor = L.laberintoCamino(m), pos = m.inicio, pasos = 0, visitadas = {}; visitadas[pos] = 1;
+      var lado = Math.min(window.innerWidth - 32, window.innerHeight - 300, 520); lado = Math.max(lado, 220);
+      var cv = h('canvas', { width: 800, height: 800, role: 'img', 'aria-label': 'Laberinto de ' + n + ' por ' + n + '. Llegá a la salida, abajo a la derecha.', style: 'width:' + lado + 'px;height:' + lado + 'px;background:var(--card);border:3px solid var(--azul);border-radius:12px' });
+      var g = cv.getContext('2d'), cel = 800 / n, pasosEl = h('span', null, 'Pasos: 0');
+      function color(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim() || '#0B5FA5'; }
+      function dibujar() {
+        cv.setAttribute('data-pos', pos); g.clearRect(0, 0, 800, 800);
+        var azul = color('--azul'), sol = color('--sol'), coral = color('--coral'), verde = color('--verde'), fg = color('--fg') || '#0E2233';
+        g.fillStyle = verde; g.globalAlpha = .25; g.fillRect((n - 1) * cel, (n - 1) * cel, cel, cel); g.globalAlpha = 1;
+        g.fillStyle = sol; g.globalAlpha = .35; for (var k in visitadas) { g.fillRect((k % n) * cel + cel * .3, ((k / n) | 0) * cel + cel * .3, cel * .4, cel * .4); } g.globalAlpha = 1;
+        g.strokeStyle = fg; g.lineWidth = Math.max(3, 14 - n * .45); g.lineCap = 'round'; g.beginPath();
+        for (var i = 0; i < n * n; i++) {
+          var x = (i % n) * cel, y = ((i / n) | 0) * cel, c = m.celdas[i];
+          if (!(c & D.N)) { g.moveTo(x, y); g.lineTo(x + cel, y); } if (!(c & D.O)) { g.moveTo(x, y); g.lineTo(x, y + cel); }
+          if (i % n === n - 1 && !(c & D.E)) { g.moveTo(x + cel, y); g.lineTo(x + cel, y + cel); } if (((i / n) | 0) === n - 1 && !(c & D.S)) { g.moveTo(x, y + cel); g.lineTo(x + cel, y + cel); }
+        }
+        g.stroke();
+        g.fillStyle = coral; g.beginPath(); g.arc((pos % n) * cel + cel / 2, ((pos / n) | 0) * cel + cel / 2, cel * .32, 0, 7); g.fill();
+        g.fillStyle = verde; g.font = '800 ' + Math.round(cel * .55) + 'px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('S', (n - .5) * cel, (n - .5) * cel);
+      }
+      function abiertas(c) { var o = 0, v = m.celdas[c]; [D.N, D.E, D.S, D.O].forEach(function (d) { if (v & d) o++; }); return o; }
+      function mover(d) {
+        var moved = false;
+        for (var guard = 0; guard < 400; guard++) {
+          if (!(m.celdas[pos] & d)) break;
+          pos = (((pos / n) | 0) + D.DY[d]) * n + (pos % n) + D.DX[d]; pasos++; moved = true; visitadas[pos] = 1;
+          if (pos === m.fin) break;
+          if (abiertas(pos) !== 2) break;   // bifurcación o callejón: frena
+          var opuesto = { 1: 4, 2: 8, 4: 1, 8: 2 }[d], siguiente = null;
+          [D.N, D.E, D.S, D.O].forEach(function (x) { if ((m.celdas[pos] & x) && x !== opuesto) siguiente = x; });
+          if (!siguiente) break; d = siguiente;
+        }
+        if (!moved) return;
+        pasosEl.textContent = 'Pasos: ' + pasos; dibujar();
+        if (pos === m.fin) setTimeout(function () { ctx.ganar(pasos <= mejor * 1.25 ? 3 : pasos <= mejor * 2 ? 2 : 1); }, 250);
+      }
+      // deslizar con el dedo
+      var ini = null;
+      cv.addEventListener('pointerdown', function (e) { ini = { x: e.clientX, y: e.clientY }; try { cv.setPointerCapture(e.pointerId); } catch (x) { } });
+      cv.addEventListener('pointerup', function (e) {
+        if (!ini) return; var dx = e.clientX - ini.x, dy = e.clientY - ini.y; ini = null;
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 18) { // toque: hacia donde se tocó respecto del jugador
+          var r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * n - ((pos % n) + .5), py = (e.clientY - r.top) / r.height * n - (((pos / n) | 0) + .5); dx = px; dy = py;
+        }
+        mover(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? D.E : D.O) : (dy > 0 ? D.S : D.N));
+      });
+      function tecla(e) { var d = { ArrowUp: D.N, ArrowRight: D.E, ArrowDown: D.S, ArrowLeft: D.O }[e.key]; if (d) { e.preventDefault(); mover(d); } }
+      document.addEventListener('keydown', tecla); ctx.limpiar(function () { document.removeEventListener('keydown', tecla); });
+      function flecha(txt, d, rot) { return h('button', { class: 'btn', type: 'button', 'aria-label': txt, style: 'min-height:56px;min-width:56px;padding:0', onclick: function () { mover(d); }, html: '<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" style="transform:rotate(' + rot + 'deg)"><path d="M12 5l7 8h-4v6h-6v-6H5z" fill="#fff"/></svg>' }); }
+      el.appendChild(h('div', { class: 'estado' }, pasosEl, h('span', null, 'Tamaño: ' + n + '×' + n)));
+      el.appendChild(cv);
+      el.appendChild(h('p', { class: 'centro', style: 'font-size:16px' }, 'Deslizá el dedo o usá las flechas. Salida: abajo a la derecha (S).'));
+      el.appendChild(h('div', { style: 'display:grid;grid-template-columns:repeat(3,64px);gap:8px;justify-content:center' }, h('span'), flecha('Arriba', D.N, 0), h('span'), flecha('Izquierda', D.O, -90), flecha('Abajo', D.S, 180), flecha('Derecha', D.E, 90)));
+      dibujar();
+    }
+  });
+})();
+
+;
+/* Sudoku — 200 niveles (5 tramos de dificultad), cada tablero con solución única. */
+(function () {
+  var U = VEJ.util, h = U.h, L = VEJ.lib;
+  VEJ.juego({
+    id: 'sudoku', nombre: 'Sudoku', desc: '200 niveles, del fácil al experto.', tipo: 'niveles', niveles: 200,
+    montar: function (el, ctx) {
+      var s = L.sudoku(ctx.nivel), val = s.puzzle.slice(), fija = s.puzzle.map(Boolean), sel = -1, errores = 0, pistas = 0, hecho = false;
+      var celdas = [], tab = h('div', { 'data-tablero': '1', role: 'grid', 'aria-label': 'Tablero de Sudoku', style: 'display:grid;grid-template-columns:repeat(9,1fr);width:min(100%,460px);aspect-ratio:1;border:3px solid var(--fg);border-radius:8px;overflow:hidden;background:var(--card)' });
+      var infoErr = h('span', null, 'Errores: 0');
+      function conflicto(i) {
+        var v = val[i]; if (!v) return false; var r = (i / 9) | 0, c = i % 9, br = r - r % 3, bc = c - c % 3;
+        for (var k = 0; k < 9; k++) { if (k !== c && val[r * 9 + k] === v) return true; if (k !== r && val[k * 9 + c] === v) return true; }
+        for (var a = 0; a < 3; a++) for (var b = 0; b < 3; b++) { var j = (br + a) * 9 + bc + b; if (j !== i && val[j] === v) return true; }
+        return false;
+      }
+      function pintar() {
+        celdas.forEach(function (b, i) {
+          var r = (i / 9) | 0, c = i % 9, v = val[i], igual = sel >= 0 && val[sel] && v === val[sel], misma = sel >= 0 && ((r === ((sel / 9) | 0)) || (c === sel % 9) || ((r / 3 | 0) === ((sel / 9 | 0) / 3 | 0) && (c / 3 | 0) === ((sel % 9) / 3 | 0)));
+          b.textContent = v || '';
+          b.style.background = i === sel ? 'var(--sol)' : igual ? 'rgba(11,95,165,.35)' : misma ? 'rgba(11,95,165,.12)' : 'transparent';
+          b.style.color = i === sel ? '#0E2233' : conflicto(i) ? 'var(--coral)' : fija[i] ? 'var(--fg)' : 'var(--azul)';
+          b.style.fontWeight = fija[i] ? '800' : '600';
+          b.setAttribute('aria-label', 'Fila ' + (r + 1) + ', columna ' + (c + 1) + (v ? ', ' + v : ', vacía') + (fija[i] ? ', dato inicial' : ''));
+        });
+        infoErr.textContent = 'Errores: ' + errores;
+      }
+      for (var i = 0; i < 81; i++) (function (i) {
+        var r = (i / 9) | 0, c = i % 9;
+        var b = h('button', { type: 'button', role: 'gridcell', style: 'border:0;padding:0;font:inherit;font-size:clamp(18px,5.4vw,26px);border-right:' + (c % 3 === 2 && c < 8 ? '3px solid var(--fg)' : '1px solid var(--line)') + ';border-bottom:' + (r % 3 === 2 && r < 8 ? '3px solid var(--fg)' : '1px solid var(--line)') + ';aspect-ratio:1;min-width:0', onclick: function () { sel = i; pintar(); } });
+        celdas.push(b); tab.appendChild(b);
+      })(i);
+      function poner(d) {
+        if (hecho || sel < 0 || fija[sel]) return;
+        if (d && d !== s.solucion[sel]) errores++;
+        val[sel] = d; pintar(); comprobar();
+      }
+      function comprobar() {
+        if (val.every(function (v, i) { return v === s.solucion[i]; })) { hecho = true; setTimeout(function () { ctx.ganar(errores === 0 && pistas === 0 ? 3 : errores <= 3 ? 2 : 1); }, 350); }
+      }
+      function pista() { if (hecho || pistas >= 3) return; var vacias = []; val.forEach(function (v, i) { if (v !== s.solucion[i]) vacias.push(i); }); if (!vacias.length) return; sel = sel >= 0 && vacias.indexOf(sel) >= 0 ? sel : vacias[0]; val[sel] = s.solucion[sel]; fija[sel] = true; pistas++; pistaBtn.textContent = 'Pista (' + (3 - pistas) + ')'; pintar(); comprobar(); }
+      function tecla(e) { if (/^[1-9]$/.test(e.key)) poner(+e.key); else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') poner(0); else if (sel >= 0 && /^Arrow/.test(e.key)) { e.preventDefault(); var d = { ArrowUp: -9, ArrowDown: 9, ArrowLeft: -1, ArrowRight: 1 }[e.key]; var n = sel + d; if (n >= 0 && n < 81 && !(Math.abs(d) === 1 && ((n / 9) | 0) !== ((sel / 9) | 0))) { sel = n; pintar(); } } }
+      document.addEventListener('keydown', tecla); ctx.limpiar(function () { document.removeEventListener('keydown', tecla); });
+      var pad = h('div', { style: 'display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:min(100%,460px)' });
+      for (var d = 1; d <= 9; d++) (function (d) { pad.appendChild(h('button', { class: 'btn', type: 'button', style: 'min-height:56px;padding:0;font-size:24px', onclick: function () { poner(d); } }, String(d))); })(d);
+      pad.appendChild(h('button', { class: 'btn coral', type: 'button', style: 'min-height:56px;padding:0;font-size:16px', 'aria-label': 'Borrar', onclick: function () { poner(0); } }, 'Borrar'));
+      var pistaBtn = h('button', { class: 'btn sol', type: 'button', style: 'min-height:48px', onclick: pista }, 'Pista (3)');
+      el.appendChild(h('div', { class: 'estado' }, infoErr, h('span', null, 'Dificultad: ' + ['Muy fácil', 'Fácil', 'Media', 'Difícil', 'Experto'][Math.min(4, ((ctx.nivel - 1) / 40) | 0)])));
+      el.appendChild(tab); el.appendChild(pad); el.appendChild(pistaBtn);
+      sel = val.findIndex(function (v) { return !v; }); pintar();
+    }
+  });
+})();
+
+;
+/* Sopa de letras — 200 niveles. Se arrastra el dedo sobre la palabra (o se toca la primera y la última letra). */
+(function () {
+  var U = VEJ.util, h = U.h, L = VEJ.lib;
+  var COLORES = ['#0B5FA5', '#D93A32', '#0C7F6D', '#B7791F', '#7B3FA0', '#0B7285'];
+  VEJ.juego({
+    id: 'sopa-de-letras', nombre: 'Sopa de letras', desc: '200 sopas para encontrar palabras.', tipo: 'niveles', niveles: 200,
+    montar: function (el, ctx) {
+      var s = L.sopa(ctx.nivel), n = s.n, hallo = {}, celdasHalladas = {}, inicio = -1, fin = -1, tapInicio = -1, t0 = Date.now(), cant = 0;
+      var tab = h('div', { 'data-tablero': '1', role: 'grid', 'aria-label': 'Sopa de letras', style: 'display:grid;grid-template-columns:repeat(' + n + ',1fr);width:min(100%,520px);aspect-ratio:1;background:var(--card);border:3px solid var(--azul);border-radius:12px;touch-action:none;user-select:none' });
+      var celdas = [];
+      for (var i = 0; i < n * n; i++) { var c = h('div', { role: 'gridcell', style: 'display:flex;align-items:center;justify-content:center;font:800 clamp(14px,4.4vw,24px) Bricolage Grotesque,sans-serif;border-radius:8px;margin:1px' }, s.grid[i]); celdas.push(c); tab.appendChild(c); }
+      var lista = h('ul', { style: 'list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center' });
+      var items = s.palabras.map(function (p) { var li = h('li', { class: 'chip', style: 'min-height:44px' }, p.w); lista.appendChild(li); return li; });
+      function linea(a, b) { // celdas en línea recta de a hacia b (forzado a 8 direcciones)
+        var ar = (a / n) | 0, ac = a % n, br = (b / n) | 0, bc = b % n, dr = br - ar, dc = bc - ac;
+        if (dr !== 0 && dc !== 0 && Math.abs(dr) !== Math.abs(dc)) { if (Math.abs(dr) > Math.abs(dc)) dc = 0; else dr = 0; }
+        var len = Math.max(Math.abs(dr), Math.abs(dc)), sr = Math.sign(dr), sc = Math.sign(dc), o = [];
+        for (var k = 0; k <= len; k++) o.push((ar + sr * k) * n + ac + sc * k); return o;
+      }
+      function pintar(sel) {
+        celdas.forEach(function (c, i) { var col = celdasHalladas[i]; c.style.background = col || 'transparent'; c.style.color = col ? '#fff' : 'var(--fg)'; });
+        (sel || []).forEach(function (i) { celdas[i].style.background = 'var(--sol)'; celdas[i].style.color = '#0E2233'; });
+      }
+      function intentar(a, b) {
+        var p = L.sopaCheck(s, a, b); if (!p || hallo[p.w]) { pintar(); return false; }
+        hallo[p.w] = 1; cant++; var col = COLORES[cant % COLORES.length];
+        for (var k = 0; k < p.w.length; k++) celdasHalladas[(p.r + p.dr * k) * n + p.c + p.dc * k] = col;
+        var li = items[s.palabras.indexOf(p)]; li.style.textDecoration = 'line-through'; li.style.background = col; li.style.color = '#fff'; li.style.borderColor = col;
+        pintar();
+        if (cant === s.palabras.length) { var seg = (Date.now() - t0) / 1000; setTimeout(function () { ctx.ganar(seg <= s.palabras.length * 14 ? 3 : seg <= s.palabras.length * 30 ? 2 : 1); }, 350); }
+        return true;
+      }
+      function celdaEn(e) { var r = tab.getBoundingClientRect(), x = Math.floor((e.clientX - r.left) / r.width * n), y = Math.floor((e.clientY - r.top) / r.height * n); if (x < 0 || y < 0 || x >= n || y >= n) return -1; return y * n + x; }
+      var movio = false;
+      tab.addEventListener('pointerdown', function (e) { inicio = celdaEn(e); fin = inicio; movio = false; try { tab.setPointerCapture(e.pointerId); } catch (x) { } pintar([inicio].concat(tapInicio >= 0 ? [tapInicio] : [])); });
+      tab.addEventListener('pointermove', function (e) { if (inicio < 0) return; var c = celdaEn(e); if (c < 0 || c === fin) return; fin = c; if (c !== inicio) movio = true; pintar(linea(inicio, fin)); });
+      tab.addEventListener('pointerup', function () {
+        if (inicio < 0) return;
+        if (movio) { var l = linea(inicio, fin); intentar(l[0], l[l.length - 1]); tapInicio = -1; }
+        else if (tapInicio >= 0 && tapInicio !== inicio) { var l2 = linea(tapInicio, inicio); intentar(l2[0], l2[l2.length - 1]); tapInicio = -1; }
+        else { tapInicio = inicio; pintar([inicio]); }
+        inicio = -1;
+      });
+      el.appendChild(h('div', { class: 'estado' }, h('span', null, 'Palabras: ' + s.palabras.length)));
+      el.appendChild(tab); el.appendChild(lista);
+      el.appendChild(h('p', { class: 'centro', style: 'font-size:16px;color:var(--muted)' }, 'Arrastrá sobre la palabra, o tocá la primera y la última letra.' + (ctx.nivel > 40 ? ' Pueden estar en diagonal.' : '') + (ctx.nivel > 100 ? ' Y también al revés.' : '')));
+      pintar();
+    }
+  });
+})();
+
+;
+/* Ahorcado — solo (palabra al azar) o entre amigos (palabra secreta que escribe uno de ustedes). */
+(function () {
+  var U = VEJ.util, h = U.h;
+  var BANCO = { 'Verano': ['SOMBRILLA', 'PROTECTOR', 'HELADO', 'MOCHILA', 'VACACIONES', 'REPOSERA', 'CARPA', 'FOGON', 'PILETA', 'CARACOL', 'ATARDECER', 'BROCHETA'], 'Animales': ['ELEFANTE', 'MURCIELAGO', 'CARPINCHO', 'TORTUGA', 'PINGUINO', 'CANGREJO', 'MARIPOSA', 'JIRAFA', 'DELFIN', 'GAVIOTA'], 'Comidas': ['MILANESA', 'EMPANADA', 'ALFAJOR', 'CHORIPAN', 'PROVOLETA', 'ENSALADA', 'FIDEOS', 'BUDIN', 'PANQUEQUE', 'LASAÑA'], 'Países': ['ARGENTINA', 'URUGUAY', 'BRASIL', 'PARAGUAY', 'CHILE', 'ESPAÑA', 'MEXICO', 'JAPON', 'ITALIA', 'CANADA'] };
+  var TECLAS = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
+  var sinTilde = function (s) { return s.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, function (m) { return m; }).replace(/Ñ/g, 'Ñ').replace(/[̀-ͯ]/g, ''); };
+  function dibujo(err) {
+    var partes = ['<line x1="20" y1="170" x2="120" y2="170"/><line x1="40" y1="170" x2="40" y2="20"/><line x1="40" y1="20" x2="110" y2="20"/><line x1="110" y1="20" x2="110" y2="40"/>', '<circle cx="110" cy="52" r="12"/>', '<line x1="110" y1="64" x2="110" y2="110"/>', '<line x1="110" y1="74" x2="92" y2="94"/>', '<line x1="110" y1="74" x2="128" y2="94"/>', '<line x1="110" y1="110" x2="95" y2="140"/>', '<line x1="110" y1="110" x2="125" y2="140"/>'];
+    return '<svg viewBox="0 0 160 180" width="170" height="190" role="img" aria-label="Errores: ' + err + ' de 6" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round">' + partes.slice(0, err + 1).join('') + '</svg>';
+  }
+  VEJ.juego({
+    id: 'ahorcado', nombre: 'Ahorcado', desc: 'Solo o entre amigos, con tu palabra secreta.', tipo: 'mesa',
+    montar: function (el, ctx) {
+      function menu() {
+        el.innerHTML = '';
+        var cat = 'Verano';
+        var catSel = h('div', { class: 'sel', role: 'group', 'aria-label': 'Categoría' });
+        function pintarCat() { catSel.innerHTML = ''; Object.keys(BANCO).forEach(function (k) { catSel.appendChild(h('button', { type: 'button', 'aria-pressed': String(k === cat), onclick: function () { cat = k; pintarCat(); } }, k)); }); }
+        pintarCat();
+        el.appendChild(h('div', { class: 'tarjeta', style: 'width:100%' }, h('h3', { style: 'font-size:24px' }, 'Jugar solo'), catSel, h('button', { class: 'btn grande sol', type: 'button', onclick: function () { partida(U.azar(BANCO[cat])); } }, 'Palabra al azar')));
+        var inp = h('input', { type: 'text', id: 'secreta', placeholder: 'Escribí la palabra secreta', autocomplete: 'off', autocapitalize: 'characters', maxlength: 20, 'aria-label': 'Palabra secreta', style: 'text-transform:uppercase' }), er = h('div');
+        el.appendChild(h('div', { class: 'tarjeta', style: 'width:100%' }, h('h3', { style: 'font-size:24px' }, 'Entre amigos'), h('p', null, 'Uno escribe una palabra en secreto y le pasa el celu al que adivina.'), inp, er,
+          h('button', { class: 'btn grande', type: 'button', onclick: function () { var w = sinTilde(inp.value.trim()); if (!/^[A-ZÑ ]{2,20}$/.test(w) || !/[A-ZÑ]/.test(w)) { er.innerHTML = ''; er.appendChild(h('div', { class: 'msg mal' }, 'Usá entre 2 y 20 letras, sin números.')); return; } partida(w); } }, 'Empezar')));
+      }
+      function partida(palabra) {
+        palabra = sinTilde(palabra); var usadas = {}, err = 0, fin = false;
+        el.innerHTML = '';
+        var dib = h('div', { class: 'centro', html: dibujo(0), style: 'color:var(--fg)' }), pal = h('div', { class: 'gran centro', style: 'font-size:clamp(28px,9vw,44px);letter-spacing:.12em;word-break:break-word;min-height:1.2em', 'aria-live': 'polite' }), msj = h('div', { role: 'status' });
+        var teclado = h('div', { style: 'display:grid;grid-template-columns:repeat(7,1fr);gap:6px;width:100%' });
+        var bt = {};
+        TECLAS.forEach(function (l) { bt[l] = h('button', { class: 'btn', type: 'button', style: 'min-height:52px;padding:0;font-size:20px', onclick: function () { jugarLetra(l); } }, l); teclado.appendChild(bt[l]); });
+        function ver() { var s = ''; for (var i = 0; i < palabra.length; i++) { var c = palabra[i]; s += c === ' ' ? '  ' : (usadas[c] || fin ? c : '_') + ' '; } pal.textContent = s.trim(); }
+        function terminar(gano) {
+          fin = true; ver(); Object.keys(bt).forEach(function (k) { bt[k].disabled = true; }); msj.innerHTML = '';
+          msj.appendChild(h('div', { class: 'msg ' + (gano ? 'ok' : 'mal') }, gano ? '¡Ganaste! La palabra era ' + palabra + '.' : 'Perdiste. La palabra era ' + palabra + '.'));
+          msj.appendChild(h('div', { class: 'fila', style: 'margin-top:12px' }, h('button', { class: 'btn grande sol', type: 'button', onclick: menu }, 'Jugar de nuevo')));
+        }
+        function jugarLetra(l) {
+          if (fin || usadas[l]) return; usadas[l] = 1;
+          if (palabra.indexOf(l) >= 0) { bt[l].style.background = 'var(--verde)'; } else { err++; bt[l].style.background = 'var(--coral)'; dib.innerHTML = dibujo(err); }
+          bt[l].disabled = true; ver();
+          var completa = palabra.split('').every(function (c) { return c === ' ' || usadas[c]; });
+          if (completa) terminar(true); else if (err >= 6) terminar(false);
+        }
+        function tecla(e) { var k = e.key.length === 1 ? sinTilde(e.key) : ''; if (/^[A-ZÑ]$/.test(k)) jugarLetra(k); }
+        document.addEventListener('keydown', tecla); ctx.limpiar(function () { document.removeEventListener('keydown', tecla); });
+        el.appendChild(dib); el.appendChild(pal); el.appendChild(msj); el.appendChild(teclado); ver();
+      }
+      menu();
+    }
+  });
+})();
+
+;
+/* Torres de Hanoi — 8 niveles (de 3 a 10 discos). Se toca la torre de origen y después la de destino. */
+(function () {
+  var U = VEJ.util, h = U.h, COL = ['#0B5FA5', '#FFC93C', '#D93A32', '#0C7F6D'];
+  VEJ.juego({
+    id: 'hanoi', nombre: 'Torres de Hanoi', desc: 'Pasá los discos con la menor cantidad de movimientos.', tipo: 'niveles', niveles: 8,
+    montar: function (el, ctx) {
+      var n = ctx.nivel + 2, minimo = Math.pow(2, n) - 1, torres = [[], [], []], sel = -1, movs = 0;
+      for (var d = n; d >= 1; d--) torres[0].push(d);
+      var cont = h('div', { style: 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:520px' }), info = h('span', null, 'Movimientos: 0'), msj = h('div', { role: 'status', class: 'centro', style: 'min-height:28px' });
+      var altoDisco = Math.max(16, Math.min(30, 230 / n));
+      function pintar() {
+        cont.innerHTML = '';
+        torres.forEach(function (t, i) {
+          var col = h('button', { type: 'button', 'aria-label': 'Torre ' + (i + 1) + (t.length ? ', disco de arriba ' + t[t.length - 1] : ', vacía') + (sel === i ? ', seleccionada' : ''), style: 'min-height:' + (altoDisco * n + 40) + 'px;border:3px solid ' + (sel === i ? 'var(--sol)' : 'var(--line)') + ';background:' + (sel === i ? 'rgba(255,201,60,.18)' : 'var(--card)') + ';border-radius:18px;display:flex;flex-direction:column-reverse;align-items:center;gap:3px;padding:8px 4px;position:relative;overflow:hidden', onclick: function () { tocar(i); } });
+          col.appendChild(h('span', { style: 'position:absolute;bottom:0;top:12px;width:8px;background:var(--line);border-radius:4px;z-index:0', 'aria-hidden': 'true' }));
+          t.forEach(function (disco) { col.appendChild(h('span', { 'aria-hidden': 'true', style: 'z-index:1;height:' + altoDisco + 'px;width:' + (28 + disco * (68 / n)) + '%;max-width:96%;background:' + COL[disco % 4] + ';border-radius:10px;box-shadow:0 2px 0 rgba(14,34,51,.3)' })); });
+          cont.appendChild(col);
+        });
+        info.textContent = 'Movimientos: ' + movs;
+      }
+      function tocar(i) {
+        if (torres[2].length === n) return;
+        if (sel < 0) { if (torres[i].length) { sel = i; pintar(); } return; }
+        if (sel === i) { sel = -1; pintar(); return; }
+        var o = torres[sel], d = torres[i], disco = o[o.length - 1];
+        if (d.length && d[d.length - 1] < disco) { msj.textContent = 'Un disco grande no puede ir sobre uno más chico.'; sel = -1; pintar(); return; }
+        msj.textContent = ''; d.push(o.pop()); sel = -1; movs++; pintar();
+        if (torres[2].length === n) setTimeout(function () { ctx.ganar(movs <= minimo ? 3 : movs <= minimo * 1.5 ? 2 : 1); }, 400);
+      }
+      el.appendChild(h('div', { class: 'estado' }, info, h('span', null, 'Discos: ' + n), h('span', null, 'Mínimo: ' + minimo)));
+      el.appendChild(h('p', { class: 'centro' }, 'Llevá todos los discos a la torre de la derecha. Tocá una torre y después la de destino.'));
+      el.appendChild(cont); el.appendChild(msj);
+      el.appendChild(h('button', { class: 'btn linea', type: 'button', style: 'color:var(--fg)', onclick: ctx.reiniciar }, 'Reiniciar'));
+      pintar();
+    }
+  });
+})();
+
+;
+/* Anagramas — 100 niveles: ordená las letras y descubrí la palabra (cada vez más largas). */
+(function () {
+  var U = VEJ.util, h = U.h, L = VEJ.lib;
+  var POOL = L.PALABRAS.concat('ESCALERA TELEFONO VENTANA CUADERNO LAPICERA CAMPERA ZAPATILLA PELOTA BICICLETA GUITARRA MARTILLO ESPEJO CORTINA ALMOHADA REFRIGERADOR COMPUTADORA TELEVISOR CHOCOLATE MERMELADA'.split(' '))
+    .filter(function (w, i, a) { return a.indexOf(w) === i && w.length >= 4 && w.length <= 11; }).sort(function (a, b) { return a.length - b.length || (a < b ? -1 : 1); });
+  VEJ.juego({
+    id: 'anagramas', nombre: 'Anagramas', desc: 'Ordená las letras y descubrí la palabra.', tipo: 'niveles', niveles: 100,
+    montar: function (el, ctx) {
+      var n = ctx.nivel, largo = Math.min(10, 4 + Math.floor((n - 1) / 17)), cand = POOL.filter(function (w) { return w.length === largo; });
+      var r = U.rng(n * 977 + 3), palabra = cand[Math.floor(r() * cand.length)], letras, intentos = 0;
+      do { letras = U.mezclar(palabra.split(''), r); intentos++; } while (letras.join('') === palabra && intentos < 20);
+      var usado = letras.map(function () { return false; }), respuesta = [], pistas = 0, fallos = 0;
+      var slots = h('div', { style: 'display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:56px', 'aria-live': 'polite' }), banco = h('div', { style: 'display:flex;flex-wrap:wrap;gap:8px;justify-content:center' }), msj = h('div', { role: 'status' });
+      function pintar() {
+        slots.innerHTML = ''; banco.innerHTML = '';
+        for (var i = 0; i < largo; i++) slots.appendChild(h('span', { class: 'gran', style: 'width:' + Math.min(44, 300 / largo) + 'px;height:56px;border-bottom:4px solid var(--azul);display:flex;align-items:center;justify-content:center;font-size:28px' }, respuesta[i] != null ? letras[respuesta[i]] : ''));
+        letras.forEach(function (l, i) { banco.appendChild(h('button', { class: 'btn', type: 'button', disabled: usado[i], style: 'min-width:52px;min-height:56px;padding:0;font-size:24px;' + (usado[i] ? 'opacity:.25' : ''), 'aria-label': 'Letra ' + l, onclick: function () { poner(i); } }, l)); });
+      }
+      function poner(i) {
+        if (usado[i] || respuesta.length >= largo) return; usado[i] = true; respuesta.push(i); pintar();
+        if (respuesta.length === largo) {
+          var intento = respuesta.map(function (k) { return letras[k]; }).join('');
+          if (intento === palabra) { msj.innerHTML = ''; setTimeout(function () { ctx.ganar(pistas === 0 && fallos === 0 ? 3 : pistas + fallos <= 2 ? 2 : 1); }, 300); }
+          else { fallos++; msj.innerHTML = ''; msj.appendChild(h('div', { class: 'msg mal centro' }, 'Esa no es. Probá otra vez.')); setTimeout(function () { respuesta = []; usado = letras.map(function () { return false; }); pintar(); }, 700); }
+        }
+      }
+      function borrar() { if (!respuesta.length) return; usado[respuesta.pop()] = false; msj.innerHTML = ''; pintar(); }
+      function pista() {
+        if (pistas >= 2) return; pistas++;
+        respuesta = []; usado = letras.map(function () { return false; });
+        for (var k = 0; k < pistas; k++) { var idx = letras.findIndex(function (l, j) { return l === palabra[k] && !usado[j]; }); usado[idx] = true; respuesta.push(idx); }
+        pistaBtn.textContent = 'Pista (' + (2 - pistas) + ')'; pintar();
+      }
+      var pistaBtn = h('button', { class: 'btn sol', type: 'button', onclick: pista }, 'Pista (2)');
+      el.appendChild(h('p', { class: 'centro' }, 'Ordená las letras para formar una palabra de ' + largo + ' letras.'));
+      el.appendChild(slots); el.appendChild(msj); el.appendChild(banco);
+      el.appendChild(h('div', { class: 'fila', style: 'width:100%;max-width:420px' }, h('button', { class: 'btn coral', type: 'button', onclick: borrar }, 'Borrar'), pistaBtn));
+      pintar();
+    }
+  });
+})();
+
+;
+/* Puzzle deslizante — 30 niveles (3×3, 4×4 y 5×5) con una imagen de playa dibujada en el momento. */
+(function () {
+  var U = VEJ.util, h = U.h;
+  var imagen = null;
+  function dibujar() {
+    if (imagen) return imagen;
+    var cv = document.createElement('canvas'); cv.width = cv.height = 600; var g = cv.getContext('2d');
+    var c = VEJ.marca.colores || {}, azul = c.azul || '#0B5FA5', sol = c.amarillo || '#FFC93C', coral = c.coral || '#D93A32', verde = c.verde || '#0C7F6D';
+    var cielo = g.createLinearGradient(0, 0, 0, 360); cielo.addColorStop(0, '#8FD3F4'); cielo.addColorStop(1, '#F4FAFC'); g.fillStyle = cielo; g.fillRect(0, 0, 600, 600);
+    g.fillStyle = sol; g.beginPath(); g.arc(470, 120, 70, 0, 7); g.fill();
+    g.strokeStyle = sol; g.lineWidth = 8; g.lineCap = 'round'; for (var a = 0; a < 12; a++) { var an = a * Math.PI / 6; g.beginPath(); g.moveTo(470 + Math.cos(an) * 92, 120 + Math.sin(an) * 92); g.lineTo(470 + Math.cos(an) * 120, 120 + Math.sin(an) * 120); g.stroke(); }
+    g.fillStyle = azul; g.fillRect(0, 300, 600, 130);
+    g.strokeStyle = '#fff'; g.lineWidth = 6; for (var w = 0; w < 4; w++) { g.beginPath(); for (var x = 0; x <= 600; x += 10) g.lineTo(x, 330 + w * 28 + Math.sin(x / 28 + w) * 7); g.stroke(); }
+    g.fillStyle = '#F2D49B'; g.fillRect(0, 430, 600, 170);
+    g.fillStyle = '#0E2233'; g.fillRect(148, 270, 10, 230);
+    g.fillStyle = coral; g.beginPath(); g.moveTo(60, 290); g.quadraticCurveTo(153, 140, 246, 290); g.closePath(); g.fill();
+    g.fillStyle = '#fff'; g.beginPath(); g.moveTo(106, 290); g.quadraticCurveTo(124, 190, 153, 175); g.quadraticCurveTo(140, 230, 153, 290); g.closePath(); g.fill();
+    g.fillStyle = verde; g.beginPath(); g.moveTo(400, 560); g.quadraticCurveTo(440, 460, 520, 470); g.quadraticCurveTo(470, 500, 460, 560); g.closePath(); g.fill();
+    g.fillStyle = sol; g.fillRect(300, 480, 130, 22); g.fillStyle = coral; g.fillRect(300, 502, 130, 22);
+    g.fillStyle = azul; g.beginPath(); g.arc(240, 540, 26, 0, 7); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(240, 540, 12, 0, 7); g.fill();
+    imagen = cv.toDataURL('image/png'); return imagen;
+  }
+  VEJ.juego({
+    id: 'puzzle', nombre: 'Puzzle deslizante', desc: 'Deslizá las piezas hasta armar la imagen.', tipo: 'niveles', niveles: 30,
+    montar: function (el, ctx) {
+      var k = ctx.nivel <= 10 ? 3 : ctx.nivel <= 20 ? 4 : 5, total = k * k, r = U.rng(ctx.nivel * 6007 + 1);
+      var orden = []; for (var i = 0; i < total; i++) orden.push(i);               // orden[posicion] = pieza (total-1 = hueco)
+      var vacio = total - 1, previo = -1, mezcla = 25 + ctx.nivel * 6 + k * 10;
+      for (var m = 0; m < mezcla; m++) {                                         // se mezcla con movimientos legales: siempre tiene solución
+        var vec = vecinos(vacio).filter(function (x) { return x !== previo; }), q = vec[Math.floor(r() * vec.length)];
+        orden[vacio] = orden[q]; orden[q] = total - 1; previo = vacio; vacio = q;
+      }
+      if (orden.every(function (v, i) { return v === i; })) { orden[vacio] = orden[vacio - 1]; orden[vacio - 1] = total - 1; vacio--; }
+      var movs = 0, hecho = false, tab = h('div', { 'data-tablero': '1', role: 'grid', 'aria-label': 'Puzzle de ' + k + ' por ' + k, style: 'position:relative;width:min(100%,460px);aspect-ratio:1;border:3px solid var(--azul);border-radius:12px;overflow:hidden;background:var(--card)' }), info = h('span', null, 'Movimientos: 0'), piezas = [];
+      function vecinos(i) { var r0 = (i / k) | 0, c = i % k, o = []; if (r0 > 0) o.push(i - k); if (r0 < k - 1) o.push(i + k); if (c > 0) o.push(i - 1); if (c < k - 1) o.push(i + 1); return o; }
+      var src = dibujar();
+      for (var p = 0; p < total - 1; p++) piezas.push(h('button', { type: 'button', class: 'pz', style: 'position:absolute;border:1px solid rgba(255,255,255,.7);padding:0;background:url(' + src + ') ' + ((p % k) * 100 / (k - 1)) + '% ' + (((p / k) | 0) * 100 / (k - 1)) + '% / ' + (k * 100) + '% ' + (k * 100) + '%;width:' + (100 / k) + '%;height:' + (100 / k) + '%;transition:left .12s,top .12s;border-radius:6px', 'aria-label': 'Pieza ' + (p + 1), onclick: (function (p) { return function () { tocar(p); }; })(p) }, h('span', { style: 'position:absolute;left:4px;top:2px;font:800 13px sans-serif;color:#fff;text-shadow:0 1px 2px #000;pointer-events:none' }, String(p + 1))));
+      piezas.forEach(function (b) { tab.appendChild(b); });
+      function pos() { orden.forEach(function (pz, i) { if (pz === total - 1) return; var b = piezas[pz]; b.style.left = (i % k) * 100 / k + '%'; b.style.top = ((i / k) | 0) * 100 / k + '%'; }); info.textContent = 'Movimientos: ' + movs; }
+      function tocar(pz) {
+        if (hecho) return; var i = orden.indexOf(pz), v = orden.indexOf(total - 1);
+        if (vecinos(i).indexOf(v) < 0) return;
+        orden[v] = pz; orden[i] = total - 1; movs++; pos();
+        if (orden.every(function (x, j) { return x === j; })) { hecho = true; setTimeout(function () { ctx.ganar(movs <= mezcla ? 3 : movs <= mezcla * 2 ? 2 : 1); }, 350); }
+      }
+      el.appendChild(h('div', { class: 'estado' }, info, h('span', null, k + '×' + k)));
+      el.appendChild(tab);
+      el.appendChild(h('p', { class: 'centro', style: 'font-size:16px' }, 'Tocá una pieza pegada al hueco para deslizarla.'));
+      el.appendChild(h('div', { class: 'fila', style: 'width:100%;max-width:460px;align-items:center' }, h('img', { src: src, alt: 'Imagen terminada de referencia', width: 96, height: 96, style: 'border-radius:12px;flex:none;width:96px;height:96px' }), h('button', { class: 'btn linea', type: 'button', style: 'color:var(--fg)', onclick: ctx.reiniciar }, 'Reiniciar')));
+      pos();
+    }
+  });
+})();
+
+;
+/* Nonogramas — 60 niveles. Las pistas de cada fila y columna dicen cuántas casillas seguidas van pintadas. */
+(function () {
+  var U = VEJ.util, h = U.h, L = VEJ.lib;
+  VEJ.juego({
+    id: 'nonogramas', nombre: 'Nonogramas', desc: 'Pintá casillas con las pistas y aparece un dibujo.', tipo: 'niveles', niveles: L.NONO_NIVELES,
+    montar: function (el, ctx) {
+      var q = L.nonograma(ctx.nivel), n = q.n, tab = []; for (var y = 0; y < n; y++) tab.push(new Array(n).fill(0));   // 0 vacío, 1 pintado, 2 marcado con X
+      var modo = 1, hecho = false, maxF = Math.max.apply(null, q.filas.map(function (f) { return f.length; })), maxC = Math.max.apply(null, q.cols.map(function (c) { return c.length; }));
+      var celdaPx = Math.floor(Math.min(46, (Math.min(window.innerWidth - 32, 520) - maxF * 18) / n)); celdaPx = Math.max(celdaPx, 22);
+      var grid = h('div', { 'data-tablero': '1', role: 'grid', 'aria-label': 'Nonograma de ' + n + ' por ' + n, style: 'display:grid;grid-template-columns:auto repeat(' + n + ',' + celdaPx + 'px);gap:2px;align-items:center;justify-items:center;touch-action:none' }), botones = [];
+      grid.appendChild(h('div'));
+      for (var c = 0; c < n; c++) grid.appendChild(h('div', { style: 'display:flex;flex-direction:column;justify-content:flex-end;align-items:center;font:700 ' + Math.max(11, celdaPx * .42) + 'px Figtree,sans-serif;line-height:1.1;min-height:' + (maxC * 15) + 'px;padding-bottom:2px', 'aria-label': 'Columna ' + (c + 1) + ': ' + q.cols[c].join(' ') }, q.cols[c].map(function (v) { return h('span', null, String(v)); })));
+      for (var f = 0; f < n; f++) {
+        grid.appendChild(h('div', { style: 'display:flex;gap:4px;justify-content:flex-end;padding-right:4px;font:700 ' + Math.max(11, celdaPx * .42) + 'px Figtree,sans-serif', 'aria-label': 'Fila ' + (f + 1) + ': ' + q.filas[f].join(' ') }, q.filas[f].map(function (v) { return h('span', null, String(v)); })));
+        botones.push([]);
+        for (var c2 = 0; c2 < n; c2++) { var b = h('button', { type: 'button', style: 'width:' + celdaPx + 'px;height:' + celdaPx + 'px;padding:0;border:2px solid var(--line);border-radius:6px;background:var(--card);font:800 ' + celdaPx * .6 + 'px sans-serif', 'aria-label': 'Fila ' + (f + 1) + ', columna ' + (c2 + 1) + ', vacía' }); botones[f].push(b); grid.appendChild(b); }
+      }
+      function ver(y, x) { var v = tab[y][x], b = botones[y][x]; b.style.background = v === 1 ? 'var(--azul)' : 'var(--card)'; b.style.borderColor = v === 1 ? 'var(--azul)' : 'var(--line)'; b.textContent = v === 2 ? '×' : ''; b.style.color = 'var(--coral)'; b.setAttribute('aria-label', 'Fila ' + (y + 1) + ', columna ' + (x + 1) + (v === 1 ? ', pintada' : v === 2 ? ', marcada' : ', vacía')); }
+      function poner(y, x, v) { if (hecho || tab[y][x] === v) return; tab[y][x] = v; ver(y, x); if (L.nonoCumple(q, tab.map(function (f) { return f.map(function (z) { return z === 1 ? 1 : 0; }); }))) { hecho = true; setTimeout(function () { ctx.ganar(3); }, 400); } }
+      var arrastrando = null;
+      botones.forEach(function (fila, y) { fila.forEach(function (b, x) {
+        b.addEventListener('pointerdown', function (e) { e.preventDefault(); try { b.releasePointerCapture(e.pointerId); } catch (x) { } var nuevo = tab[y][x] === modo ? 0 : modo; arrastrando = nuevo; poner(y, x, nuevo); });
+        b.addEventListener('pointerenter', function () { if (arrastrando !== null) poner(y, x, arrastrando); });
+      }); });
+      var fin = function () { arrastrando = null; }; document.addEventListener('pointerup', fin); ctx.limpiar(function () { document.removeEventListener('pointerup', fin); });
+      var selModo = h('div', { class: 'sel', role: 'group', 'aria-label': 'Modo' }), pint = function () { selModo.innerHTML = ''; [[1, 'Pintar'], [2, 'Marcar ×']].forEach(function (o) { selModo.appendChild(h('button', { type: 'button', 'aria-pressed': String(modo === o[0]), onclick: function () { modo = o[0]; pint(); } }, o[1])); }); }; pint();
+      el.appendChild(h('div', { class: 'estado' }, h('span', null, n + '×' + n)));
+      el.appendChild(selModo);
+      el.appendChild(h('div', { style: 'max-width:100%;overflow-x:auto;padding:4px' }, grid));
+      el.appendChild(h('p', { class: 'centro', style: 'font-size:16px;color:var(--muted)' }, 'Tocá o arrastrá para pintar. Con “Marcar ×” señalás las casillas que seguro están vacías.'));
+      el.appendChild(h('button', { class: 'btn linea', type: 'button', style: 'color:var(--fg)', onclick: ctx.reiniciar }, 'Reiniciar'));
+    }
+  });
+})();
+
+;
+/* Buscaminas — tres dificultades. Tocá para destapar; con el botón “Bandera” marcás dónde creés que hay una mina. */
+(function () {
+  var U = VEJ.util, h = U.h, NIV = { 'Fácil': { f: 8, c: 8, m: 9 }, 'Medio': { f: 10, c: 10, m: 18 }, 'Difícil': { f: 12, c: 10, m: 28 } };
+  var MINA = '<svg viewBox="0 0 24 24" width="70%" height="70%" aria-hidden="true"><circle cx="12" cy="12" r="6" fill="#fff"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>', BANDERA = '<svg viewBox="0 0 24 24" width="70%" height="70%" aria-hidden="true"><path d="M6 3v18" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M7 4l12 4.5L7 13z" fill="#FFC93C"/></svg>';
+  var COL = ['', '#0B5FA5', '#0C7F6D', '#D93A32', '#4B2E83', '#8A4B08', '#0B7285', '#0E2233', '#555'];
+  VEJ.juego({
+    id: 'buscaminas', nombre: 'Buscaminas', desc: 'Destapá sin pisar una mina.', tipo: 'mesa',
+    montar: function (el, ctx) {
+      var dif = 'Fácil';
+      function menu() {
+        el.innerHTML = '';
+        var sel = h('div', { class: 'sel', role: 'group', 'aria-label': 'Dificultad' }); function p() { sel.innerHTML = ''; Object.keys(NIV).forEach(function (k) { sel.appendChild(h('button', { type: 'button', 'aria-pressed': String(k === dif), onclick: function () { dif = k; p(); } }, k + ' (' + NIV[k].m + ' minas)')); }); } p();
+        el.appendChild(h('div', { class: 'tarjeta', style: 'width:100%' }, h('p', null, 'Los números dicen cuántas minas hay alrededor. Usá la lógica para destapar todo lo que no es mina.'), sel, h('button', { class: 'btn grande sol', type: 'button', onclick: partida }, 'Empezar')));
+      }
+      function partida() {
+        var cfg = NIV[dif], F = cfg.f, C = cfg.c, mina = [], abierta = [], bandera = [], primera = true, fin = false, banderas = 0, modo = 'abrir', t0 = 0, seg = 0, timer = null;
+        for (var i = 0; i < F * C; i++) { mina.push(false); abierta.push(false); bandera.push(false); }
+        el.innerHTML = '';
+        var tab = h('div', { 'data-tablero': '1', role: 'grid', 'aria-label': 'Tablero de buscaminas', style: 'display:grid;grid-template-columns:repeat(' + C + ',1fr);gap:3px;width:min(100%,' + (C * 52) + 'px)' }), celdas = [], msj = h('div', { role: 'status' });
+        var info = h('span', null, 'Minas: ' + cfg.m), tiempoEl = h('span', null, '0:00');
+        function vec(i) { var r = (i / C) | 0, c = i % C, o = []; for (var a = -1; a <= 1; a++) for (var b = -1; b <= 1; b++) { if (!a && !b) continue; var rr = r + a, cc = c + b; if (rr >= 0 && cc >= 0 && rr < F && cc < C) o.push(rr * C + cc); } return o; }
+        function cuenta(i) { return vec(i).filter(function (j) { return mina[j]; }).length; }
+        function ver(i) {
+          var b = celdas[i];
+          if (abierta[i]) { var n = cuenta(i); b.style.background = mina[i] ? 'var(--coral)' : 'var(--card)'; b.style.border = '2px solid var(--line)'; if (mina[i]) b.innerHTML = MINA; else b.textContent = n || ''; b.style.color = mina[i] ? '#fff' : COL[n]; b.setAttribute('aria-label', mina[i] ? 'Mina' : n + ' minas alrededor'); }
+          else { b.style.background = 'var(--azul)'; b.style.border = '2px solid var(--azul)'; b.style.color = '#fff'; if (bandera[i]) b.innerHTML = BANDERA; else b.textContent = ''; b.setAttribute('aria-label', bandera[i] ? 'Bandera' : 'Sin destapar'); }
+        }
+        function repartir(evitar) { var libres = []; for (var i = 0; i < F * C; i++) if (i !== evitar && vec(evitar).indexOf(i) < 0) libres.push(i); U.mezclar(libres).slice(0, cfg.m).forEach(function (i) { mina[i] = true; }); }
+        function abrir(i) {
+          if (fin || bandera[i] || abierta[i]) return;
+          if (primera) { primera = false; repartir(i); t0 = Date.now(); timer = setInterval(function () { seg = Math.floor((Date.now() - t0) / 1000); tiempoEl.textContent = U.tiempo(seg); }, 1000); ctx.limpiar(function () { clearInterval(timer); }); }
+          var cola = [i];
+          while (cola.length) { var x = cola.pop(); if (abierta[x] || bandera[x]) continue; abierta[x] = true; ver(x); if (mina[x]) return perder(); if (cuenta(x) === 0) vec(x).forEach(function (y) { if (!abierta[y]) cola.push(y); }); }
+          if (abierta.filter(Boolean).length === F * C - cfg.m) ganar();
+        }
+        function perder() { fin = true; clearInterval(timer); mina.forEach(function (m, i) { if (m) { abierta[i] = true; ver(i); } }); msj.innerHTML = ''; msj.appendChild(h('div', { class: 'msg mal' }, 'Pisaste una mina.')); msj.appendChild(h('div', { class: 'fila', style: 'margin-top:12px' }, h('button', { class: 'btn grande sol', type: 'button', onclick: partida }, 'Reintentar'), h('button', { class: 'btn linea', type: 'button', style: 'color:var(--fg)', onclick: menu }, 'Cambiar dificultad'))); }
+        function ganar() { fin = true; clearInterval(timer); msj.innerHTML = ''; msj.appendChild(h('div', { class: 'msg ok' }, '¡Ganaste en ' + U.tiempo(seg) + '!')); msj.appendChild(h('div', { class: 'fila', style: 'margin-top:12px' }, h('button', { class: 'btn grande sol', type: 'button', onclick: partida }, 'Jugar otra'), h('button', { class: 'btn linea', type: 'button', style: 'color:var(--fg)', onclick: menu }, 'Cambiar dificultad'))); }
+        function bandear(i) { if (fin || abierta[i]) return; bandera[i] = !bandera[i]; banderas += bandera[i] ? 1 : -1; info.textContent = 'Minas: ' + (cfg.m - banderas); ver(i); }
+        for (var k = 0; k < F * C; k++) (function (k) {
+          var b = h('button', { type: 'button', role: 'gridcell', style: 'aspect-ratio:1;min-width:0;padding:0;border-radius:8px;font:800 clamp(15px,4.6vw,22px) Bricolage Grotesque,sans-serif', onclick: function () { if (modo === 'bandera') bandear(k); else abrir(k); } });
+          var largo = null; b.addEventListener('pointerdown', function () { largo = setTimeout(function () { largo = 'hecho'; bandear(k); }, 450); });
+          b.addEventListener('pointerup', function (e) { if (largo === 'hecho') { e.preventDefault(); b.dataset.noclick = '1'; } else clearTimeout(largo); });
+          b.addEventListener('click', function (e) { if (b.dataset.noclick) { e.stopImmediatePropagation(); delete b.dataset.noclick; } }, true);
+          b.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+          celdas.push(b); tab.appendChild(b);
+        })(k);
+        celdas.forEach(function (_, i) { ver(i); });
+        var selModo = h('div', { class: 'sel', role: 'group', 'aria-label': 'Acción al tocar' }); function pm() { selModo.innerHTML = ''; [['abrir', 'Destapar'], ['bandera', 'Bandera']].forEach(function (o) { selModo.appendChild(h('button', { type: 'button', 'aria-pressed': String(modo === o[0]), onclick: function () { modo = o[0]; pm(); } }, o[1])); }); } pm();
+        el.appendChild(h('div', { class: 'estado' }, info, tiempoEl)); el.appendChild(selModo); el.appendChild(tab); el.appendChild(msj);
+        el.appendChild(h('p', { class: 'centro', style: 'font-size:16px;color:var(--muted)' }, 'Mantené apretada una casilla para ponerle bandera.'));
+      }
+      menu();
+    }
+  });
+})();
+
+;
+/* Número secreto — adiviná con pistas de “más” y “menos”. */
+(function () {
+  var U = VEJ.util, h = U.h, RANGOS = { 'Fácil (1 a 50)': 50, 'Medio (1 a 100)': 100, 'Difícil (1 a 1000)': 1000 };
+  VEJ.juego({
+    id: 'numero-secreto', nombre: 'Número secreto', desc: 'Adiviná con pistas de “más” y “menos”.', tipo: 'mesa',
+    montar: function (el, ctx) {
+      var rango = 'Medio (1 a 100)';
+      function menu() {
+        el.innerHTML = ''; var sel = h('div', { class: 'sel', role: 'group', 'aria-label': 'Rango' });
+        function p() { sel.innerHTML = ''; Object.keys(RANGOS).forEach(function (k) { sel.appendChild(h('button', { type: 'button', 'aria-pressed': String(k === rango), onclick: function () { rango = k; p(); } }, k)); }); } p();
+        var rec = U.jget('vej-numero-mejor', {});
+        el.appendChild(h('div', { class: 'tarjeta', style: 'width:100%' }, h('p', null, 'Pensé un número. Probá y te digo si es más alto o más bajo. Ganás con la menor cantidad de intentos posible.'), sel, rec[RANGOS[rango]] ? h('p', { style: 'font-weight:700' }, 'Tu mejor marca en este rango: ' + rec[RANGOS[rango]] + ' intentos') : null, h('button', { class: 'btn grande sol', type: 'button', onclick: partida }, 'Empezar')));
+      }
+      function partida() {
+        var max = RANGOS[rango], secreto = 1 + Math.floor(Math.random() * max), intentos = 0, bajo = 1, alto = max, hist = [];
+        el.innerHTML = '';
+        var inp = h('input', { type: 'number', inputmode: 'numeric', min: 1, max: max, id: 'num', 'aria-label': 'Tu número', placeholder: '¿Qué número es?', style: 'text-align:center;font-size:28px;font-weight:800' }), msj = h('div', { role: 'status', 'aria-live': 'polite' }), lista = h('div', { class: 'sel', style: 'justify-content:center' }), rangoEl = h('span', null, 'Entre ' + bajo + ' y ' + alto), cant = h('span', null, 'Intentos: 0');
+        function probar() {
+          var v = parseInt(inp.value, 10); msj.innerHTML = '';
+          if (!(v >= 1 && v <= max)) { msj.appendChild(h('div', { class: 'msg mal' }, 'Poné un número entre 1 y ' + max + '.')); return; }
+          intentos++; cant.textContent = 'Intentos: ' + intentos; inp.value = '';
+          if (v === secreto) {
+            var rec = U.jget('vej-numero-mejor', {}); if (!rec[max] || intentos < rec[max]) { rec[max] = intentos; U.lsSet('vej-numero-mejor', JSON.stringify(rec)); }
+            msj.appendChild(h('div', { class: 'msg ok' }, '¡Era ' + secreto + '! Lo adivinaste en ' + intentos + (intentos === 1 ? ' intento.' : ' intentos.')));
+            msj.appendChild(h('div', { class: 'fila', style: 'margin-top:12px' }, h('button', { class: 'btn grande sol', type: 'button', onclick: partida }, 'Jugar otra vez'), h('button', { class: 'btn linea', type: 'button', style: 'color:var(--fg)', onclick: menu }, 'Cambiar rango'))); inp.disabled = true; go.disabled = true; return;
+          }
+          var mas = v < secreto; if (mas) bajo = Math.max(bajo, v + 1); else alto = Math.min(alto, v - 1);
+          rangoEl.textContent = 'Entre ' + bajo + ' y ' + alto; lista.appendChild(h('span', { class: 'chip', style: 'background:' + (mas ? 'var(--azul)' : 'var(--coral)') + ';color:#fff;border-color:transparent' }, v + (mas ? ' · más alto' : ' · más bajo')));
+          msj.appendChild(h('div', { class: 'msg ' + (mas ? 'info' : 'mal') }, mas ? 'Más alto.' : 'Más bajo.')); inp.focus();
+        }
+        var go = h('button', { class: 'btn grande', type: 'button', onclick: probar }, 'Probar');
+        inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') probar(); });
+        el.appendChild(h('div', { class: 'estado' }, rangoEl, cant)); el.appendChild(h('div', { class: 'tarjeta', style: 'width:100%' }, inp, go)); el.appendChild(msj); el.appendChild(lista);
+      }
+      menu();
+    }
+  });
+})();
+
+;
+/* Simón dice — repetí la secuencia de colores. Cada ronda suma un color. */
+(function () {
+  var U = VEJ.util, h = U.h, TONOS = [329.6, 415.3, 261.6, 220], COLORES = ['var(--azul)', 'var(--sol)', 'var(--coral)', 'var(--verde)'], NOM = ['Azul', 'Amarillo', 'Rojo', 'Verde'];
+  VEJ.juego({
+    id: 'simon', nombre: 'Simón dice', desc: 'Repetí la secuencia de colores sin equivocarte.', tipo: 'mesa',
+    montar: function (el, ctx) {
+      var audio = null, seq = [], paso = 0, turno = 'espera', mejor = +(U.lsGet('vej-simon-mejor') || 0), sonido = U.lsGet('vej-sonido') !== '0', tms = [];
+      function tono(i, dur) { if (!sonido) return; try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); var o = audio.createOscillator(), g = audio.createGain(); o.type = 'sine'; o.frequency.value = TONOS[i]; g.gain.value = .18; o.connect(g); g.connect(audio.destination); o.start(); setTimeout(function () { try { o.stop(); } catch (e) { } }, dur || 300); } catch (e) { } }
+      var pads = [], msj = h('div', { role: 'status', 'aria-live': 'polite', class: 'centro', style: 'font-weight:700;min-height:28px' }), ronda = h('span', null, 'Ronda: 0'), rec = h('span', null, 'Mejor: ' + mejor);
+      var tab = h('div', { style: 'display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(100%,420px)' });
+      for (var i = 0; i < 4; i++) (function (i) { var b = h('button', { type: 'button', 'aria-label': NOM[i], style: 'aspect-ratio:1;min-height:110px;border:0;border-radius:28px;background:' + COLORES[i] + ';opacity:.55;transition:opacity .1s,transform .1s;box-shadow:0 6px 0 rgba(14,34,51,.25)', onclick: function () { tocar(i); } }); pads.push(b); tab.appendChild(b); })(i);
+      function encender(i, dur) { pads[i].style.opacity = '1'; pads[i].style.transform = 'scale(.96)'; tono(i, dur); var t = setTimeout(function () { pads[i].style.opacity = '.55'; pads[i].style.transform = ''; }, dur || 300); tms.push(t); }
+      ctx.limpiar(function () { tms.forEach(clearTimeout); try { audio && audio.close(); } catch (e) { } });
+      function reproducir() {
+        turno = 'espera'; msj.textContent = 'Mirá la secuencia…'; var vel = Math.max(250, 600 - seq.length * 25);
+        seq.forEach(function (c, k) { tms.push(setTimeout(function () { encender(c, vel * .7); }, 700 + k * vel)); });
+        tms.push(setTimeout(function () { turno = 'jugador'; paso = 0; msj.textContent = 'Tu turno'; }, 700 + seq.length * vel));
+      }
+      function siguiente() { seq.push(Math.floor(Math.random() * 4)); ronda.textContent = 'Ronda: ' + seq.length; reproducir(); }
+      function tocar(i) {
+        if (turno !== 'jugador') return; encender(i, 220);
+        if (i !== seq[paso]) { turno = 'fin'; var logro = seq.length - 1; if (logro > mejor) { mejor = logro; U.lsSet('vej-simon-mejor', String(mejor)); rec.textContent = 'Mejor: ' + mejor; } msj.innerHTML = ''; msj.appendChild(h('div', { class: 'msg mal' }, 'Te equivocaste. Llegaste a la ronda ' + Math.max(logro, 0) + '.')); empezar.hidden = false; empezar.textContent = 'Jugar de nuevo'; return; }
+        paso++; if (paso === seq.length) { turno = 'espera'; msj.textContent = '¡Bien!'; tms.push(setTimeout(siguiente, 900)); }
+      }
+      var empezar = h('button', { class: 'btn grande sol', type: 'button', onclick: function () { seq = []; empezar.hidden = true; msj.textContent = ''; siguiente(); } }, 'Empezar');
+      var son = h('button', { class: 'btn chico linea', type: 'button', style: 'color:var(--fg)', 'aria-pressed': String(sonido), onclick: function () { sonido = !sonido; U.lsSet('vej-sonido', sonido ? '1' : '0'); son.textContent = 'Sonido: ' + (sonido ? 'sí' : 'no'); son.setAttribute('aria-pressed', String(sonido)); } }, 'Sonido: ' + (sonido ? 'sí' : 'no'));
+      el.appendChild(h('div', { class: 'estado' }, ronda, rec)); el.appendChild(msj); el.appendChild(tab); el.appendChild(empezar); el.appendChild(son);
+    }
+  });
+})();
+
+;
+VEJ.arrancar();
+</script>
+</body>
+</html>

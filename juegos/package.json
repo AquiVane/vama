@@ -1,0 +1,15 @@
+{
+  "name": "juegos",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:dev": "node scripts/build.mjs --dev",
+    "build:marca": "node scripts/build.mjs",
+    "test": "node --test \"test/*.test.js\"",
+    "test:e2e": "node test/e2e/run.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}

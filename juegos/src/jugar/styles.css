@@ -1,0 +1,79 @@
+@font-face{font-family:'Bricolage Grotesque';font-weight:800;font-style:normal;font-display:swap;src:url(/juegos/fonts/bricolage.woff2) format('woff2')}
+@font-face{font-family:'Figtree';font-weight:400 700;font-style:normal;font-display:swap;src:url(/juegos/fonts/figtree.woff2) format('woff2')}
+:root{--azul:#0B5FA5;--sol:#FFC93C;--coral:#D93A32;--verde:#0C7F6D;--bg:#F4FAFC;--fg:#0E2233;--card:#FFFFFF;--line:#CFE2EC;--muted:#3F566A;--ink:#0E2233;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0A1A2B;--fg:#F2F8FB;--card:#102A42;--line:#244A68;--muted:#C9DCE8;color-scheme:dark}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--fg);font-family:'Figtree',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:18px;line-height:1.4;-webkit-text-size-adjust:100%;overflow-x:hidden;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+h1,h2,h3,p{margin:0}
+h1,h2,h3,.disp{font-family:'Bricolage Grotesque','Figtree',system-ui,sans-serif;font-weight:800}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--sol);outline-offset:3px}
+a{color:inherit}
+[hidden]{display:none!important}
+.pag{min-height:100%;display:flex;flex-direction:column;padding:max(14px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.cen{width:100%;max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:18px;flex:1}
+.franja{display:flex;height:12px;border-radius:6px;overflow:hidden;flex:none}.franja i{flex:1}
+.franja i:nth-child(1){background:#FFC93C}.franja i:nth-child(2){background:#D93A32}.franja i:nth-child(3){background:#0C7F6D}.franja i:nth-child(4){background:#0B5FA5}
+/* fondos oscuros → texto blanco */
+.oscuro{background:var(--azul);color:#fff}.oscuro *{color:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 22px;border-radius:16px;border:0;font-weight:700;font-size:18px;text-decoration:none;text-align:center;background:var(--azul);color:#fff}
+.btn.sol{background:var(--sol);color:var(--ink)}.btn.coral{background:var(--coral);color:#fff}.btn.verde{background:var(--verde);color:#fff}
+.btn.linea{background:transparent;border:3px solid currentColor}
+.btn.grande{min-height:60px;font-size:20px;border-radius:18px;font-family:'Bricolage Grotesque','Figtree',sans-serif;font-weight:800}
+.btn.chico{min-height:48px;padding:0 16px;font-size:16px}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.fila{display:flex;flex-wrap:wrap;gap:12px}.fila>*{flex:1 1 140px}
+.tarjeta{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.msg{border-radius:16px;padding:14px 16px;font-weight:600;line-height:1.4}
+.msg.mal{background:var(--coral);color:#fff}.msg.ok{background:var(--verde);color:#fff}.msg.info{background:var(--azul);color:#fff}
+input[type=text],input[type=number],input[type=email]{width:100%;min-height:56px;padding:0 16px;border:2px solid var(--line);border-radius:14px;background:var(--card);color:var(--fg);font:600 20px 'Figtree',system-ui,sans-serif;-webkit-user-select:text;user-select:text}
+input.codigo{text-transform:uppercase;letter-spacing:2px;text-align:center;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:24px}
+input::placeholder{color:var(--muted);opacity:.75}
+label{font-weight:700}
+/* barra de juego */
+.barra{display:flex;align-items:center;gap:10px;flex:none}
+.barra h2{font-size:clamp(22px,6vw,30px);line-height:1.05;flex:1;min-width:0}
+.barra .btn{flex:none}
+/* inicio */
+.marca{display:flex;align-items:center;gap:12px}
+.marca svg,.marca img{width:48px;height:48px;border-radius:14px;flex:none}
+.marca b{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:clamp(22px,6vw,28px)}
+.hero h1{font-size:clamp(34px,9vw,52px);line-height:1}
+.grid-j{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:14px}
+.j{border:0;border-radius:22px;padding:18px;min-height:132px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;gap:10px;box-shadow:0 6px 0 rgba(14,34,51,.18)}
+.j small{font-size:15px;font-weight:700;letter-spacing:.08em}
+.j h3{font-size:24px;line-height:1.05}.j p{font-size:16px;line-height:1.3}
+.j.azul{background:var(--azul);color:#fff}.j.sol{background:var(--sol);color:var(--ink)}.j.coral{background:var(--coral);color:#fff}.j.verde{background:var(--verde);color:#fff}
+.j.azul *,.j.coral *,.j.verde *{color:#fff}.j.sol *{color:var(--ink)}
+.j .prog{font-size:15px;font-weight:700}
+/* niveles */
+.pestanas{display:flex;gap:8px;flex-wrap:wrap}
+.pestanas button{min-height:48px;padding:0 16px;border-radius:14px;border:2px solid var(--line);background:transparent;font-weight:700}
+.pestanas button[aria-pressed=true]{background:var(--azul);border-color:var(--azul);color:#fff}
+.niveles{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:10px}
+.niv{min-height:56px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-weight:800;font-size:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.niv.hecho{background:var(--verde);border-color:var(--verde);color:#fff}
+.niv.actual{background:var(--sol);border-color:var(--sol);color:var(--ink)}
+.niv[disabled]{opacity:.45}
+.niv small{font-size:11px;font-weight:700}
+/* tablero genérico */
+.area{flex:1;display:flex;flex-direction:column;align-items:center;gap:14px;min-height:0}
+.estado{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-weight:700}
+.estado span{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:6px 14px;min-height:40px;display:inline-flex;align-items:center}
+.gran{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;line-height:1}
+.centro{text-align:center}
+.superpuesto{position:fixed;inset:0;background:rgba(10,26,43,.88);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50}
+.superpuesto .caja{background:var(--azul);color:#fff;border-radius:28px;padding:26px;max-width:460px;width:100%;display:flex;flex-direction:column;gap:16px;text-align:center}
+.superpuesto .caja *{color:#fff}.superpuesto .caja .sol{color:var(--ink)}
+.superpuesto h2{font-size:34px;line-height:1}
+.estrellas{display:flex;gap:6px;justify-content:center}
+.estrellas svg{width:40px;height:40px}
+.chip{display:inline-flex;align-items:center;min-height:48px;padding:0 16px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-weight:700}
+.sel{display:flex;flex-wrap:wrap;gap:8px}
+.sel button{min-height:48px;padding:0 16px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-weight:700}
+.sel button[aria-pressed=true]{background:var(--azul);border-color:var(--azul);color:#fff}
+.cuenta{font-size:clamp(80px,30vw,180px)}
+.tablero{display:grid;gap:6px;width:100%;max-width:min(100%,520px)}
+canvas{max-width:100%;touch-action:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
