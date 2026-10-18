@@ -53,7 +53,7 @@ Hay un cliente de ejemplo (`ejemplo`). La licencia y el cobro de cada cliente se
 2. Al abrir el link la app genera un ID de dispositivo, el servidor lo registra como el activo y devuelve un token firmado. Se guarda en `localStorage` (`vej-licencia`).
 3. Cada vez que abre con internet, la app avisa que sigue viva (latido). Sin internet no pasa nada: la firma se verifica localmente.
 4. Si la licencia se pasó a otro dispositivo, en el próximo latido muestra “Esta app se activó en otro dispositivo”.
-5. Cambio de celu: “Ya la compré” → mail con link nuevo. Máximo una reactivación gratis cada 180 días, y se rechaza si el dispositivo activo dio señal en los últimos 14 días (constantes en `workers/verano-en-juego/config/politica.json`).
+5. Cambio de celu: “Ya la compré” → mail con link nuevo. Máximo una reactivación gratis cada 180 días, y se rechaza si el dispositivo activo dio señal en los últimos 14 días (constantes en `workers/verano-en-juego/config/politica.js`).
 6. iPhone: instalar en pantalla de inicio crea un almacenamiento nuevo. Por eso, durante las primeras 24 h el mismo link/código permite pasar de Safari a la app instalada.
 
 Claves de `localStorage`: `vej-licencia`, `vej-device`, `vej-verificada`, `vej-revocada`, `vej-anon`, `vej-prog-<juego>` (avances), `vej-sonido`, `vej-simon-mejor`, `vej-numero-mejor`.
