@@ -130,7 +130,7 @@ footer{background:var(--dark);color:#fff;font-size:13px;padding:28px 0}
         customization:{visual:{hideFormTitle:true,style:{theme:"default"}},paymentMethods:{creditCard:"all",debitCard:"all",mercadoPago:"all"}},
         callbacks:{onReady:function(){},onError:function(e){console.error(e)},
           onSubmit:function(p){return new Promise(async function(res,rej){
-            if(p.selectedPaymentMethod==="wallet_purchase"||p.selectedPaymentMethod==="account_money")return res();
+            if(p.selectedPaymentMethod==="wallet_purchase"||p.selectedPaymentMethod==="account_money"||p.selectedPaymentMethod==="onboarding_credits")return res();
             try{var pr=await fetch(C.MP_WORKER+"/pay",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({},p.formData,{items:[{producto:of.slug,amount:of.ars}]},meta()))});
               var d=await pr.json();
               if(d.status==="approved")listo(); else if(d.status==="in_process"||d.status==="pending")msg("Tu pago está en proceso. Apenas se acredite, lo ves en tu acceso.","#B45309");

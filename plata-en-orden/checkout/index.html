@@ -171,7 +171,7 @@
             return new Promise(async function (resolve, reject) {
               // "Dinero en cuenta" / Mercado Pago: el Brick lo resuelve solo con la preferencia
               // (el pago llega por webhook); acá no se procesa nada.
-              if (p.selectedPaymentMethod === 'wallet_purchase' || p.selectedPaymentMethod === 'account_money') return resolve();
+              if (p.selectedPaymentMethod === 'wallet_purchase' || p.selectedPaymentMethod === 'account_money' || p.selectedPaymentMethod === 'onboarding_credits') return resolve();
               try {
                 var pr = await fetch(C.MP_WORKER + '/pay', {
                   method: 'POST', headers: { 'Content-Type': 'application/json' },
