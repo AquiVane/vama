@@ -11,7 +11,7 @@ Leé **`HANDOFF.md`** (raíz de este repo) ANTES de tocar código. El backend vi
 - Vaneh se comunica **solo en español** — nunca respondas en inglés.
 - **Nunca hagas cambios no pedidos.** Si algo te parece mejorable, preguntá antes.
 - **Repo PÚBLICO: jamás subir claves, tokens ni los archivos pagos** (xlsx, PDFs, video). Los archivos van al Worker (R2, detrás del login). Solo se admiten valores públicos por diseño (public key de MP, client-id de PayPal, ID del Pixel).
-- **Nunca sacar a la persona del checkout para pagar** (ni Mercado Pago hosteado): el pago va embebido (Brick + PayPal).
+- **Nunca sacar a la persona del checkout para pagar** (ni Mercado Pago hosteado): el pago va embebido (Brick + PayPal). Única excepción (Vaneh, 20/10/2026): si ella elige "Mercado Pago" o "Mercado Crédito" dentro del Brick, sale a la pantalla de MP y vuelve por `back_urls`.
 - **Nunca un desvío/lead magnet en una página de producto**: todo lleva a la compra.
 - Todo se optimiza para **mobile primero**; probá sin scroll horizontal y con todos los botones funcionando.
 - Las páginas nuevas se muestran primero en preview (artifact) para que Vaneh las corrija.
