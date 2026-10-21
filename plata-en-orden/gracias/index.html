@@ -119,12 +119,17 @@ footer{background:var(--dark);color:#fff;font-size:13px;padding:28px 0}
   function meta(){return {fbp:VAMA.cookie("_fbp"),fbc:VAMA.cookie("_fbc"),client_user_agent:navigator.userAgent,event_source_url:location.href,vid:VAMA.vid(),lead_email:cuenta()}}
   function listo(){msg("¡Listo! Te llevamos a tu acceso…","#16a34a");$("mp-sec").hidden=true;$("pp-sec").hidden=true;setTimeout(function(){location.href="/cursos/"},1800)}
   function noDisponible(){msg("Esta oferta ya no está disponible.","#B91C1C")}
+  // Precarga: las preferencias de las dos ofertas se piden apenas carga la página (si ya tenemos el email),
+  // así al tocar "Sí, lo quiero" el formulario de pago aparece casi al instante.
+  var prefCache={};
+  function pedirPref(o){return fetch(C.MP_WORKER+"/preference",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({items:[{producto:o.slug,amount:o.ars}]},meta()))}).then(function(r){return r.json().then(function(j){return {r:{status:r.status},j:j}})})}
+  function prefDe(o){var c=prefCache[o.slug]; if(c&&cuenta()===c.em){delete prefCache[o.slug];return c.p.catch(function(){return pedirPref(o)})} return pedirPref(o)}
+  function precargar(){ if(!cuenta()||q.get("estado")==="pendiente")return; Object.keys(OFERTAS).forEach(function(k){var o=OFERTAS[k]; var p=pedirPref(o); p.catch(function(){}); prefCache[o.slug]={p:p,em:cuenta()};}); }
   async function montarBrick(){
     if(busy||!of)return; if(!cuenta()){msg("Escribí tu email de compra para seguir.","#B91C1C");return;} busy=true; msg("");
     try{
       if(brick){try{await brick.unmount()}catch(e){} brick=null;} $("brick").innerHTML="";
-      var r=await fetch(C.MP_WORKER+"/preference",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({items:[{producto:of.slug,amount:of.ars}]},meta()))});
-      var j=await r.json(); if(!j.preference_id){ if(r.status===403||/no est/.test(j.error||""))noDisponible(); throw new Error("pref"); }
+      var pr0=await prefDe(of), r=pr0.r, j=pr0.j; if(!j.preference_id){ if(r.status===403||/no est/.test(j.error||""))noDisponible(); throw new Error("pref"); }
       var mp=new MercadoPago(C.MP_PUBLIC_KEY,{locale:"es-AR"});
       brick=await mp.bricks().create("payment","brick",{initialization:{amount:of.ars,preferenceId:j.preference_id,payer:{email:cuenta()}},
         customization:{visual:{hideFormTitle:true,style:{theme:"default"}},paymentMethods:{creditCard:"all",debitCard:"all",mercadoPago:"all"}},
@@ -153,6 +158,7 @@ footer{background:var(--dark);color:#fff;font-size:13px;padding:28px 0}
     $("pago-email").hidden=!!em; $("pago").hidden=false; $("pago").scrollIntoView({block:"start"}); ppOk=false; $("ppbtn").innerHTML="";
     VAMA.track("InitiateCheckout",{value:of.ars,currency:"ARS",content_name:of.t}); tabPago("mp");});});
   var pe=$("p-email"); if(pe)pe.addEventListener("change",function(){if(tab==="mp")montarBrick();});
+  precargar();
 })();
 </script>
 

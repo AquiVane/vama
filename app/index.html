@@ -774,6 +774,8 @@ function setPago(m){payModo=m;document.querySelectorAll("[data-pm]").forEach(fun
   if(m==="mp")montarBrickPro();else montarPaypalSub();}
 document.querySelectorAll("[data-pm]").forEach(function(b){b.addEventListener("click",function(){setPago(b.dataset.pm);});});
 $("pro-btn").addEventListener("click",function(){mostrarPago();});
+// Precarga: el SDK de Mercado Pago se baja en segundo plano apenas abre la app, así el formulario de Pro aparece al instante.
+setTimeout(function(){cargarScript("https://sdk.mercadopago.com/js/v2").catch(function(){});},1200);
 function montarBrickPro(){if(brickPro)return;var p=(S.pro&&S.pro.precios)||{ars:3900};
   cargarScript("https://sdk.mercadopago.com/js/v2").then(function(){var mp=new MercadoPago(MP_KEY,{locale:"es-AR"});
     return mp.bricks().create("cardPayment","brickpro",{initialization:{amount:p.ars,payer:{email:S.email}},customization:{visual:{style:{theme:"default"}},paymentMethods:{maxInstallments:1}},

@@ -146,7 +146,6 @@
   async function montarBrick() {
     if (!P) return;
     if (brickBusy) { rehacer = true; return; }  // cambió el total/email mientras cargaba: se rehace al terminar
-    if (!datosValidos()) return;
     brickBusy = true;
     var msg = $('mpmsg'); msg.textContent = '';
     var timer = setTimeout(fallo, 7000);
@@ -163,12 +162,19 @@
       if (!j.preference_id) throw new Error('sin preference_id');
       var mp = new MercadoPago(C.MP_PUBLIC_KEY, { locale: 'es-AR' });
       brick = await mp.bricks().create('payment', 'paymentBrick_container', {
-        initialization: { amount: total(), preferenceId: j.preference_id, payer: { email: email() } },
+        initialization: Object.assign({ amount: total(), preferenceId: j.preference_id }, VAMA.emailOk(email()) ? { payer: { email: email() } } : {}),
         customization: { visual: { hideFormTitle: true, style: { theme: 'default' } }, paymentMethods: { creditCard: 'all', debitCard: 'all', mercadoPago: 'all' } },
         callbacks: {
           onReady: function () { clearTimeout(timer); },
           onSubmit: function (p) {
             return new Promise(async function (resolve, reject) {
+              // El formulario carga solo, sin pedir nada antes: nombre y email se validan recién al pagar.
+              if (!datosValidos()) {
+                msg.style.color = '#B91C1C'; msg.textContent = 'Completá tu nombre y email arriba para poder pagar.'; $('email-err').hidden = false;
+                var pf = !$('nombre').value.trim() ? $('nombre') : $('email'); pf.scrollIntoView({ block: 'center' }); pf.focus();
+                return reject();
+              }
+              guardarLead();
               // "Dinero en cuenta" / Mercado Pago: el Brick lo resuelve solo con la preferencia
               // (el pago llega por webhook); acá no se procesa nada.
               if (p.selectedPaymentMethod === 'wallet_purchase' || p.selectedPaymentMethod === 'account_money' || p.selectedPaymentMethod === 'onboarding_credits') return resolve();
@@ -241,7 +247,7 @@
   // ── Eventos ──
   $('bump').addEventListener('change', function () { conBump = this.checked; pintar(); if (tab === 'mp') montarBrick(); });
   var deb;
-  function alCambiarDatos() { clearTimeout(deb); deb = setTimeout(function () { if (datosValidos()) { guardarLead(); if (tab === 'mp') montarBrick(); } }, 600); }
+  function alCambiarDatos() { clearTimeout(deb); deb = setTimeout(function () { if (datosValidos()) guardarLead(); }, 600); }
   $('email').addEventListener('input', alCambiarDatos);
   $('nombre').addEventListener('input', alCambiarDatos);
 
@@ -258,7 +264,7 @@
     if (!o) { $('mpmsg').style.color = '#B91C1C'; $('mpmsg').textContent = 'No pudimos cargar los precios. Recargá la página.'; return; }
     P = o; pintar();
     VAMA.track('InitiateCheckout', { value: total(), currency: 'ARS', content_name: 'Plata en Orden' });
-    if (datosValidos()) montarBrick();
+    montarBrick();   // arranca apenas están los precios, sin esperar nombre ni email
   });
 })();
 </script>
