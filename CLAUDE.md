@@ -1,6 +1,6 @@
 # Instrucciones para Claude Code en este repo
 
-Este repo (`AquiVane/vama`) es el frontend estático de **VAMA Academy** (`academy.vamatienda.com.ar`), publicado con GitHub Pages (branch `main`, raíz). Trabajás para Vaneh (COSMART).
+Este repo (`AquiVane/vama`) es el frontend estático de **VAMA Academy** (`academy.vamatienda.com.ar`), publicado con **Cloudflare Pages** (proyecto `vama`, rama de producción `main`, auto-deploy al pushear; desde el 22/10/2026 — antes GitHub Pages, que no permite sitios comerciales). Ojo: la rama por defecto del repo en GitHub no es `main`; la producción de Cloudflare está fijada a `main`, no la cambies. Trabajás para Vaneh (COSMART).
 
 ## Al empezar cualquier sesión
 

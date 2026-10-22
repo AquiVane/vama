@@ -2,13 +2,14 @@
 
 Actualizado: 2026-09-29.
 
-## 22/10 — Migración del hosting a Cloudflare Pages (EN CURSO)
-- **Motivo:** los términos de GitHub Pages no permiten usarlo como hosting de un negocio/e-commerce (acá se vende Plata en Orden). Pedido de Vaneh: pasar los sitios comerciales a Cloudflare Pages.
-- **Hecho:** proyecto **Cloudflare Pages `vama`** (preview `vama.pages.dev`) conectado a `AquiVane/vama` con **rama de producción `main`**. Cuidado: la rama por defecto del repo en GitHub NO es `main` (es una rama `claude/...`), por eso Cloudflare la tomó al principio; ya se corrigió en Configuración → Control de rama.
-- **Pendiente:** probar `vama.pages.dev` contra `academy.vamatienda.com.ar`, cambiar el dominio (zona `vamatienda.com.ar`: borrar el CNAME `academy` → `aquivane.github.io` y agregar `academy.vamatienda.com.ar` como dominio personalizado del proyecto), despublicar GitHub Pages, borrar `CNAME` del repo y actualizar este documento y `CLAUDE.md`.
+## 22/10 — Hosting migrado de GitHub Pages a Cloudflare Pages — EN PRODUCCIÓN
+- **Motivo:** los términos de GitHub Pages no permiten usarlo como hosting de un negocio/e-commerce (acá se vende Plata en Orden). Pedido de Vaneh.
+- **Ahora:** proyecto **Cloudflare Pages `vama`** (preview `vama.pages.dev`) conectado a `AquiVane/vama` con **rama de producción `main`**, sin build, salida = raíz. Dominio personalizado: `academy.vamatienda.com.ar` (zona `vamatienda.com.ar`: el CNAME a `aquivane.github.io` se borró y Cloudflare creó el suyo). GitHub Pages **despublicado**; se borró `CNAME`. Cada push a `main` se publica solo.
+- **⚠️ La rama por defecto del repo en GitHub NO es `main`** (es una rama `claude/...` con la app Pro sin publicar). Cloudflare la tomó al principio y publicaba esa; se corrigió en Configuración → Control de rama → Rama de producción = `main`. No cambiar. La rama de la app tiene su propia URL de preview (`*.vama.pages.dev`) y **cuando se mergee a `main` se publica sola**.
+- **Comportamiento:** `/x` redirige (308) a `/x/` (igual que antes con GitHub); una URL inexistente da 404 con `404.html`. Verificado en desktop y mobile: home, `/plata-en-orden/`, `/tienda/plata-en-orden`, categorías, `/registro/`, `/cursos/`, `/app/`. Vaneh verificó que el checkout (Brick de MP + PayPal) carga. Los mails del pie los oculta la protección de Cloudflare de la zona (no es del repo).
 
 ## Qué es
-Frontend estático de `academy.vamatienda.com.ar` (GitHub Pages, `main`, raíz, CNAME en este repo). Primer producto: **Plata en Orden** ($14.900 ARS / USD 10.90) con bump **Plan de 90 días para tu fondo de emergencia** ($6.900 / USD 4.90). Backend = `cosmart-workers` (`cosmart-training-core` + `mp-productos-ganadores`). Training (`training.cosmart.com.ar`) no se toca.
+Frontend estático de `academy.vamatienda.com.ar` (Cloudflare Pages desde el 22/10, rama `main`, raíz). Primer producto: **Plata en Orden** ($14.900 ARS / USD 10.90) con bump **Plan de 90 días para tu fondo de emergencia** ($6.900 / USD 4.90). Backend = `cosmart-workers` (`cosmart-training-core` + `mp-productos-ganadores`). Training (`training.cosmart.com.ar`) no se toca.
 
 ## Páginas (kit v2, diseño aprobado por Vaneh: no se rediseña)
 - `/` home genérica (newsletter → `POST /api/newsletter`) · `/categoria/finanzas-personales/` · `/categoria/marketing-e-ia/` (redirige a la tienda de Training `training.cosmart.com.ar/tienda`: ebooks y cursos de estrategias de contenido, productos ganadores, guía a emprendedores) · `/categoria/alimentacion-saludable/` (por ahora redirige a `biensmart.vamatienda.com.ar/habitos/`, landing de Hábitos Bien Smart; cuando haya más productos pasa a ser página de categoría real) · `/tienda/plata-en-orden/` (página de producto) · `/plata-en-orden/` (landing de anuncios; form → `POST /api/lead` → checkout)
@@ -25,7 +26,7 @@ Frontend estático de `academy.vamatienda.com.ar` (GitHub Pages, `main`, raíz, 
 - Los archivos pagos (kit v2) YA ESTÁN subidos a R2 (29/09). Para reemplazarlos, subir desde el panel admin de training a `academy-plata-en-orden` (`Plata-en-Orden-con-ejemplos.xlsx`, `Plata-en-Orden-en-blanco.xlsx`, `Ordena-tu-plata-en-7-dias.pdf`, `Tutorial-Plata-en-Orden.mp4`) y a `academy-plata-en-orden-fondo90` (`Fondo-de-emergencia-en-90-dias.pdf`), con NOMBRES EXACTOS.
 - `/cursos/` es un área estilo curso: módulos con recursos descargables y la guía de 7 días como LECCIONES (texto servido por el Worker con sesión, progreso por cuenta; el PDF sigue como descarga).
 - Instrucción de la planilla en Sheets: como solo hay xlsx, el acceso explica "subir a Drive y guardar como Hojas de cálculo de Google". Si se publica un Google Sheet maestro, cambiarla por "Archivo › Hacer una copia".
-- DNS (Vaneh): zona `vamatienda.com.ar` en Cloudflare, CNAME `academy` → `aquivane.github.io` (proxy gris), SPF/DKIM de Brevo para `hola@vamatienda.com.ar`.
+- DNS (Vaneh): zona `vamatienda.com.ar` en Cloudflare, CNAME `academy` → el proyecto Pages `vama` (desde el 22/10; antes `aquivane.github.io`), SPF/DKIM de Brevo para `hola@vamatienda.com.ar`.
 
 ## App Plata en Orden, Pro y upsell (kit v2 + v3) — en la rama, NO publicado (30/09)
 - **`/app/`** (PWA): login con el MISMO usuario y contraseña de `/cursos` (`POST /auth/login`, misma sesión y `localStorage.vama_token`; solo entran compradores de la planilla, `GET /api/app/me`). En `/cursos` hay una tarjeta "Descargar la app" que lleva a `/app/`. Recursos con descarga real con sesión; Excel importable una vez (SheetJS); Google Sheets bidireccional (GIS `drive.file` + Picker + Sheets API) que queda **oculto hasta cargar `GCFG`** en `app/index.html` (clientId, apiKey, appId de un proyecto de Google Cloud; son públicos). El service worker solo cachea archivos del mismo origen.
