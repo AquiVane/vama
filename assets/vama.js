@@ -65,6 +65,20 @@ window.VAMA = (function () {
     return ofertaP[producto];
   }
 
+  // Aviso cuando la oferta venció: así el precio de lista no parece un aumento de la nada.
+  var LISTA = { 'plata-en-orden': { ars: '$29.900', usd: 'USD 21,90' } };
+  function avisoVencida(producto) {
+    var l = LISTA[producto];
+    if (!l || document.getElementById('aviso-oferta')) return;
+    var st = document.createElement('style');
+    st.textContent = '.aviso-oferta{background:#1E3A34;color:#fff;text-align:center;padding:10px 16px;font:600 14px/1.4 "DM Sans",system-ui,sans-serif;border-bottom:2px solid #7FE0A8}.aviso-oferta b{color:#7FE0A8;white-space:nowrap}';
+    document.head.appendChild(st);
+    var d = document.createElement('div');
+    d.id = 'aviso-oferta'; d.className = 'aviso-oferta'; d.setAttribute('role', 'status');
+    d.innerHTML = 'La oferta de lanzamiento terminó · precio actual <b>' + l.ars + '</b> <b>(' + l.usd + ')</b>';
+    document.body.insertBefore(d, document.body.firstChild);
+  }
+
   // Timer de la oferta: muestra la cuenta regresiva y, al vencer, pasa a precio de lista.
   function ofertaInit(producto) {
     var K = 'vama_oferta_' + producto, D = 7 * 864e5, off = 0, fin = 0, vencida = false;
@@ -75,6 +89,7 @@ window.VAMA = (function () {
       if (vencida) return; vencida = true;
       document.documentElement.classList.add('oferta-vencida');
       document.querySelectorAll('[data-lista]').forEach(function (e) { e.textContent = e.getAttribute('data-lista'); });
+      avisoVencida(producto);
     }
     function tick() {
       var r = fin - (Date.now() + off);
