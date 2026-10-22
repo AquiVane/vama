@@ -68,7 +68,7 @@ window.VAMA = (function () {
   // Oferta terminada: línea chica con el precio de oferta tachado (se muestra solo cuando venció).
   (function () {
     var st = document.createElement('style');
-    st.textContent = '.of-term{display:none!important}.oferta-vencida .of-term{display:block!important;font-size:11px;line-height:1.3;font-weight:500;color:#6B7280;margin-top:2px}.oferta-vencida .sticky .sp small.of-term{color:#6B7280;font-weight:500;font-size:11px}.of-term-g{display:none!important}.oferta-vencida .of-term-g{display:flex!important;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin:0 0 4px}.of-term-g .oft{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:#E5E7EB;color:#374151;padding:4px 9px;border-radius:99px}';
+    st.textContent = '.of-term{display:none!important}.oferta-vencida .of-term{display:block!important;font-size:11px;line-height:1.3;font-weight:500;color:#6B7280;margin-top:2px}.oferta-vencida .sticky .sp small.of-term{color:#6B7280;font-weight:500;font-size:11px}.pf{display:flex;align-items:center;gap:14px;flex-wrap:nowrap}.of-term-g{display:none!important}.oferta-vencida .of-term-g{display:flex!important;flex-direction:column;align-items:flex-start;gap:2px;margin:0}.of-term-g .oft{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6B7280;line-height:1.2}.of-term-g .was{font-size:17px;line-height:1.1}@media(max-width:600px){.oferta-vencida .pf .amt{font-size:clamp(36px,11vw,52px)}}';
     document.head.appendChild(st);
   })();
 
