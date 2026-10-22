@@ -2,6 +2,11 @@
 
 Actualizado: 2026-09-29.
 
+## 22/10 — Migración del hosting a Cloudflare Pages (EN CURSO)
+- **Motivo:** los términos de GitHub Pages no permiten usarlo como hosting de un negocio/e-commerce (acá se vende Plata en Orden). Pedido de Vaneh: pasar los sitios comerciales a Cloudflare Pages.
+- **Hecho:** proyecto **Cloudflare Pages `vama`** (preview `vama.pages.dev`) conectado a `AquiVane/vama` con **rama de producción `main`**. Cuidado: la rama por defecto del repo en GitHub NO es `main` (es una rama `claude/...`), por eso Cloudflare la tomó al principio; ya se corrigió en Configuración → Control de rama.
+- **Pendiente:** probar `vama.pages.dev` contra `academy.vamatienda.com.ar`, cambiar el dominio (zona `vamatienda.com.ar`: borrar el CNAME `academy` → `aquivane.github.io` y agregar `academy.vamatienda.com.ar` como dominio personalizado del proyecto), despublicar GitHub Pages, borrar `CNAME` del repo y actualizar este documento y `CLAUDE.md`.
+
 ## Qué es
 Frontend estático de `academy.vamatienda.com.ar` (GitHub Pages, `main`, raíz, CNAME en este repo). Primer producto: **Plata en Orden** ($14.900 ARS / USD 10.90) con bump **Plan de 90 días para tu fondo de emergencia** ($6.900 / USD 4.90). Backend = `cosmart-workers` (`cosmart-training-core` + `mp-productos-ganadores`). Training (`training.cosmart.com.ar`) no se toca.
 
