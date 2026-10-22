@@ -7,7 +7,7 @@
 <title>Checkout — Plata en Orden</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&display=swap">
-<link rel="stylesheet" href="/assets/vama.css?v=20261022">
+<link rel="stylesheet" href="/assets/vama.css?v=20261023">
 <style>
 .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:stretch}
 .line{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line)}
@@ -41,7 +41,7 @@
   <div class="grid">
     <section class="card" aria-label="Resumen del pedido">
       <h2>Tu pedido</h2>
-      <div class="line"><span>Plata en Orden<small>Planilla + guía de 7 días + tutorial</small></span><b><s class="was solo-oferta" id="l-base-lista"></s><span id="l-base"></span><small id="l-base-usd"></small></b></div>
+      <div class="line"><span>Plata en Orden<small>Planilla + guía de 7 días + tutorial</small></span><b><s class="was solo-oferta" id="l-base-lista"></s><span id="l-base"></span><small id="l-base-usd"></small><small class="of-term"><s>$14.900</s> oferta terminada</small></b></div>
       <div class="line" id="l-bump-row" hidden><span>Plan de 90 días para tu fondo de emergencia</span><b><s class="was solo-oferta" id="l-bump-lista"></s><span id="l-bump"></span><small id="l-bump-usd"></small></b></div>
       <div class="line total"><span>Total</span><span><span id="total"></span><small id="total-usd"></small></span></div>
       <div class="timer solo-oferta" role="timer">El precio de lanzamiento termina en<b data-timer>07d : 00h : 00m : 00s</b></div>
@@ -82,7 +82,7 @@
 
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 <script src="https://www.paypal.com/sdk/js?client-id=AYuQX3JJShvSkgNn0C195h3GEHGiKNtx44X3wd_5PEoBI1iinpysmDzNRqdZ7blNuZvFWIwcwhc9qiOP&currency=USD&intent=capture"></script>
-<script src="/assets/vama.js?v=20261022"></script>
+<script src="/assets/vama.js?v=20261023"></script>
 <script>
 (function () {
   var C = VAMA.cfg, PRODUCTO = 'plata-en-orden', BUMP = 'plata-en-orden-fondo90';
